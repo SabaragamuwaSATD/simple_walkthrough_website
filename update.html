@@ -7,7 +7,6 @@
     <title>Luxe Interior Design Studio</title>
     <style>
         :root {
-            /* vertical offset to clear the fixed navbar */
             --nav-offset: 48px;
         }
 
@@ -24,18 +23,14 @@
         }
 
         .logo {
-            /* Square brand container */
             display: inline-flex;
             align-items: center;
             justify-content: center;
             width: 44px;
             height: 44px;
             background: #2c3e50;
-            /* dark background */
             border: 1px solid #c9a961;
-            /* subtle highlight */
             border-radius: 6px;
-            /* keep square with soft corners */
             text-decoration: none;
         }
 
@@ -43,13 +38,10 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            /* contain within the square */
             display: block;
             padding: 6px;
-            /* breathing room around the mark */
         }
 
-        /* Navigation */
         nav {
             position: fixed;
             top: 0;
@@ -63,8 +55,6 @@
             z-index: 1000;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-
-
 
         .nav-links {
             display: flex;
@@ -85,7 +75,20 @@
             color: #c9a961;
         }
 
-        /* Video Container */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #2c3e50;
+            transition: all 0.3s;
+        }
+
         #container {
             height: 400vh;
             position: relative;
@@ -139,7 +142,6 @@
             font-weight: 300;
         }
 
-        /* Animated Text Sections */
         .scroll-text-right {
             position: absolute;
             right: 80px;
@@ -148,7 +150,6 @@
             max-width: 400px;
             opacity: 0;
             z-index: 4;
-            /* Cream background box sized to content */
             background: #f5efe6;
             color: #2c3e50;
             padding: 20px 24px;
@@ -186,18 +187,12 @@
         .text-section {
             margin-bottom: 50px;
             opacity: 0;
-            /* revealed via GSAP */
-            /* Cream background box sized to content */
             background: #f5efe6;
             padding: 24px 24px 22px;
-            /* sides/bottom */
             padding-top: 84px;
-            /* space for the number badge */
-            /* space for the big number badge */
             border-radius: 12px;
             display: inline-block;
             position: relative;
-            /* for absolute number positioning */
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
         }
 
@@ -226,10 +221,8 @@
             left: 24px;
             margin: 0;
             color: #c9a961;
-            /* brand gold for visibility on cream */
         }
 
-        /* Sections */
         section {
             padding: 100px 50px;
         }
@@ -243,7 +236,6 @@
             letter-spacing: 2px;
         }
 
-        /* Services Section */
         .services-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -253,9 +245,9 @@
         }
 
         .service-card {
-            padding: 40px;
+            padding: 50px;
             background: #f8f9fa;
-            border-radius: 10px;
+            border-radius: 0px;
             text-align: center;
             transition: transform 0.3s, box-shadow 0.3s;
         }
@@ -278,11 +270,10 @@
         }
 
         .service-card p {
-            color: #666;
+            color: #1b1a1a;
             line-height: 1.6;
         }
 
-        /* About Section */
         .about-content {
             max-width: 1200px;
             margin: 0 auto;
@@ -293,10 +284,76 @@
         }
 
         .about-image {
+            position: relative;
             width: 100%;
             height: 500px;
-            background: linear-gradient(135deg, #c9a961 0%, #8b7355 100%);
-            border-radius: 10px;
+            border-radius: 0px;
+            overflow: hidden;
+            background: #ffffff;
+            perspective: 1000px;
+        }
+
+        .about-slider {
+            position: absolute;
+            inset: 0;
+            transform-style: preserve-3d;
+        }
+
+        .about-slide {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            opacity: 0;
+            transform: scale(1.2) translateX(100%) rotateY(25deg);
+            will-change: transform, opacity;
+            transform-origin: center center;
+        }
+
+        .about-slide.is-active {
+            opacity: 1;
+            transform: scale(1) translateX(0) rotateY(0deg);
+        }
+
+        .about-image::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            /* background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, 0.25) 100%); */
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .carousel-dot.active {
+            background: #c9a961;
+            border-color: white;
+            transform: scale(1.3);
+        }
+
+        .carousel-dot:hover {
+            background: rgba(201, 169, 97, 0.8);
         }
 
         .about-text h3 {
@@ -311,7 +368,6 @@
             margin-bottom: 20px;
         }
 
-        /* Portfolio Section */
         #portfolio {
             background: #f8f9fa;
         }
@@ -371,7 +427,18 @@
             margin-bottom: 10px;
         }
 
-        /* Contact Section */
+        .portfolio-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .portfolio-item:hover img {
+            transform: scale(1.05);
+        }
+
         .contact-container {
             max-width: 800px;
             margin: 0 auto;
@@ -402,7 +469,6 @@
             background: #b8975a;
         }
 
-        /* Footer */
         footer {
             background: #2c3e50;
             color: white;
@@ -444,33 +510,14 @@
             color: #888;
         }
 
-        .about-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* Duplicate .portfolio-item block removed to fix CSS error */
-
-        .portfolio-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.3s ease;
-        }
-
-        .portfolio-item:hover img {
-            transform: scale(1.05);
-        }
-
-
-        /* Duplicate .portfolio-info block removed to fix CSS error */
-
+        /* Mobile Responsive Styles */
         @media (max-width: 768px) {
             :root {
-                --nav-offset: 36px;
+                --nav-offset: 60px;
+            }
+
+            nav {
+                padding: 15px 20px;
             }
 
             .logo {
@@ -482,49 +529,256 @@
                 padding: 5px;
             }
 
-            .text-number {
-                font-size: 44px;
-                top: 10px;
-            }
-
-            .text-section {
-                padding-top: 72px;
-            }
-
-            nav {
-                padding: 20px;
+            /* Hamburger Menu */
+            .menu-toggle {
+                display: flex;
             }
 
             .nav-links {
+                position: fixed;
+                top: 60px;
+                right: -100%;
+                width: 70%;
+                height: calc(100vh - 60px);
+                background: rgba(255, 255, 255, 0.98);
+                flex-direction: column;
+                padding: 40px 20px;
                 gap: 20px;
+                transition: right 0.3s ease;
+                box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
             }
 
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links a {
+                font-size: 16px;
+                padding: 10px 0;
+                border-bottom: 1px solid #eee;
+            }
+
+            /* Video Section */
             .video-text h1 {
-                font-size: 44px;
+                font-size: 32px;
+                margin-bottom: 15px;
+                letter-spacing: 1px;
             }
 
             .video-text p {
+                font-size: 16px;
+            }
+
+            /* Scroll Text Sections */
+            .scroll-text-right {
+                right: 20px;
+                max-width: calc(100% - 40px);
+                padding: 15px 20px;
+            }
+
+            .scroll-text-right h2 {
+                font-size: 28px;
+                margin-bottom: 15px;
+            }
+
+            .scroll-text-right p {
+                font-size: 14px;
+            }
+
+            .scroll-text-left {
+                left: 20px;
+                max-width: calc(100% - 40px);
+            }
+
+            .text-section {
+                margin-bottom: 30px;
+                padding: 20px 20px 18px;
+                padding-top: 60px;
+            }
+
+            .text-section h3 {
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+
+            .text-section p {
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+            .text-number {
+                font-size: 40px;
+                top: 10px;
+                left: 20px;
+            }
+
+            /* Sections */
+            section {
+                padding: 60px 20px;
+            }
+
+            .section-title {
+                font-size: 32px;
+                margin-bottom: 40px;
+            }
+
+            /* Services Grid */
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .service-card {
+                padding: 30px;
+            }
+
+            .service-icon {
+                font-size: 40px;
+            }
+
+            .service-card h3 {
+                font-size: 22px;
+            }
+
+            .service-card p {
+                font-size: 15px;
+            }
+
+            /* About Section */
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .about-image {
+                height: 400px;
+                order: -1;
+            }
+
+            .about-text h3 {
+                font-size: 26px;
+            }
+
+            .about-text p {
+                font-size: 15px;
+            }
+
+            /* Portfolio Grid */
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .portfolio-item {
+                height: 350px;
+            }
+
+            .portfolio-info {
+                padding: 20px;
+            }
+
+            .portfolio-info h4 {
+                font-size: 20px;
+            }
+
+            .portfolio-info p {
+                font-size: 14px;
+            }
+
+            /* Contact Section */
+            .contact-container p {
+                font-size: 16px;
+                margin-bottom: 30px;
+            }
+
+            .contact-button {
+                padding: 12px 40px;
+                font-size: 14px;
+            }
+
+            /* Footer */
+            footer {
+                padding: 40px 20px 20px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                margin-bottom: 30px;
+            }
+
+            .footer-section h4 {
                 font-size: 18px;
             }
 
-            .about-content {
-                grid-template-columns: 1fr;
+            .footer-section p,
+            .footer-section a {
+                font-size: 14px;
+            }
+
+            .footer-bottom {
+                font-size: 13px;
+            }
+        }
+
+        /* Tablet Styles */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            nav {
+                padding: 10px 30px;
+            }
+
+            .nav-links {
+                gap: 25px;
+            }
+
+            .video-text h1 {
+                font-size: 56px;
+            }
+
+            .video-text p {
+                font-size: 20px;
+            }
+
+            .scroll-text-right {
+                right: 40px;
+                max-width: 350px;
+            }
+
+            .scroll-text-left {
+                left: 40px;
+                max-width: 400px;
             }
 
             section {
-                padding: 60px 20px;
+                padding: 80px 40px;
+            }
+
+            .section-title {
+                font-size: 36px;
+            }
+
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .portfolio-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Navigation -->
     <nav>
         <a href="#home" class="logo" aria-label="Home">
             <img src="logo/dm.webp" alt="LUXE Logo" />
         </a>
-        <ul class="nav-links">
+        <div class="menu-toggle" id="menuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <ul class="nav-links" id="navLinks">
             <li><a href="#home">Home</a></li>
             <li><a href="#services">Services</a></li>
             <li><a href="#portfolio">Portfolio</a></li>
@@ -533,20 +787,15 @@
         </ul>
     </nav>
 
-    <!-- Background Music (plays only during the video section) -->
-    <!-- Place your music file at videos/music.mp3 or music/calm.mp3; the first existing source will be used -->
     <audio id="bg-music" preload="auto" loop>
-        <source src="music/calm.mp3" type="audio/mpeg">
         <source src="music/calm.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Video Scroll Section -->
     <div id="container">
         <div class="video-container">
             <video class="video-background" muted playsinline preload="metadata">
                 <source src="videos/outp1.mp4" type="video/mp4">
-                <track kind="subtitles" src="videos/output1-subtitles.vtt" srclang="en" label="English Subtitles"
-                    default>
+                <track kind="subtitles" src="videos/outp1.mp4" srclang="en" label="English Subtitles" default>
                 <track kind="descriptions" src="videos/output1-descriptions.vtt" srclang="en" label="Audio Description">
             </video>
             <div class="video-overlay">
@@ -555,7 +804,6 @@
                     <p>Luxury Interior Design That Reflects Your Style</p>
                 </div>
 
-                <!-- Animated Text Right -->
                 <div class="scroll-text-right">
                     <h2>Timeless Elegance</h2>
                     <p>We believe in creating spaces that stand the test of time, blending classic sophistication with
@@ -563,7 +811,6 @@
                 </div>
             </div>
 
-            <!-- Animated Text Left -->
             <div class="scroll-text-left">
                 <div class="text-section" id="text-1">
                     <div class="text-number">01</div>
@@ -587,7 +834,6 @@
         </div>
     </div>
 
-    <!-- Services Section -->
     <section id="services">
         <h2 class="section-title">Our Services</h2>
         <div class="services-grid">
@@ -624,12 +870,24 @@
         </div>
     </section>
 
-    <!-- About Section -->
     <section id="about">
         <h2 class="section-title">About Us</h2>
         <div class="about-content">
             <div class="about-image">
-                <img src="images/about.jpg" alt="Interior design team at work" />
+                <div class="about-slider">
+                    <img class="about-slide is-active" src="images/about.jpg" alt="Studio detail 1">
+                    <img class="about-slide" src="images/about-2.jpg" alt="Studio detail 2">
+                    <img class="about-slide" src="images/about-3.jpg" alt="Studio detail 3">
+                    <img class="about-slide" src="images/about-4.jpg" alt="Studio detail 4">
+                    <img class="about-slide" src="images/about-5.jpg" alt="Studio detail 5">
+                </div>
+                <div class="carousel-dots">
+                    <span class="carousel-dot active" data-index="0"></span>
+                    <span class="carousel-dot" data-index="1"></span>
+                    <span class="carousel-dot" data-index="2"></span>
+                    <span class="carousel-dot" data-index="3"></span>
+                    <span class="carousel-dot" data-index="4"></span>
+                </div>
             </div>
             <div class="about-text">
                 <h3>Crafting Spaces, Creating Stories</h3>
@@ -644,7 +902,6 @@
         </div>
     </section>
 
-    <!-- Portfolio Section -->
     <section id="portfolio">
         <h2 class="section-title">Featured Projects</h2>
         <div class="portfolio-grid">
@@ -656,23 +913,43 @@
                 </div>
             </div>
             <div class="portfolio-item">
-                <img src="images/coastal.jpg" alt="Modern Penthouse" />
+                <img src="images/coastal.jpg" alt="Coastal Retreat" />
                 <div class="portfolio-info">
                     <h4>Coastal Retreat</h4>
                     <p>Malibu, CA</p>
                 </div>
             </div>
             <div class="portfolio-item">
-                <img src="images/urban.jpg" alt="Modern Penthouse" />
+                <img src="images/urban.jpg" alt="Urban Loft" />
                 <div class="portfolio-info">
                     <h4>Urban Loft</h4>
                     <p>Chicago, IL</p>
                 </div>
             </div>
+            <div class="portfolio-item">
+                <img src="images/about.jpg" alt="Classic Elegance" />
+                <div class="portfolio-info">
+                    <h4>Classic Elegance</h4>
+                    <p>Boston, MA</p>
+                </div>
+            </div>
+            <div class="portfolio-item">
+                <img src="images/about-2.jpg" alt="Modern Villa" />
+                <div class="portfolio-info">
+                    <h4>Modern Villa</h4>
+                    <p>Miami, FL</p>
+                </div>
+            </div>
+            <div class="portfolio-item">
+                <img src="images/about-3.jpg" alt="Mountain Retreat" />
+                <div class="portfolio-info">
+                    <h4>Mountain Retreat</h4>
+                    <p>Aspen, CO</p>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
     <section id="contact">
         <h2 class="section-title">Let's Create Together</h2>
         <div class="contact-container">
@@ -682,7 +959,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <div class="footer-content">
             <div class="footer-section">
@@ -711,22 +987,29 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.4.0/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.3.3/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
     <script>
         $(document).ready(function () {
             console.clear();
             $('video').addClass('video-background');
 
+            // Mobile Menu Toggle
+            $('#menuToggle').click(function () {
+                $('#navLinks').toggleClass('active');
+            });
+
+            // Close menu when clicking a link
+            $('.nav-links a').click(function () {
+                $('#navLinks').removeClass('active');
+            });
+
             const video = document.querySelector(".video-background");
             const music = document.getElementById("bg-music");
             let src = video.currentSrc || video.src;
-            console.log(video, src);
 
-            /* Make sure the video is 'activated' on iOS */
             function once(el, event, fn, opts) {
                 var onceFn = function (e) {
                     el.removeEventListener(event, onceFn);
@@ -741,21 +1024,14 @@
                 video.pause();
             });
 
-            // Prime and warm-up background music for instant entry playback
             if (music) {
-                // Hint the browser to load buffers early
                 music.preload = 'auto';
                 music.load();
-                music.volume = 0; // start silent; we'll only adjust volume
+                music.volume = 0;
                 const primeMusic = function () {
                     music.play()
-                        .then(function () {
-                            // keep playing silently to avoid start-up delay later
-                            music.volume = 0;
-                        })
-                        .catch(function (err) {
-                            // Autoplay might still be blocked until a stronger gesture; safe to ignore here
-                        });
+                        .then(function () { music.volume = 0; })
+                        .catch(function () { });
                 };
                 once(document.documentElement, "touchstart", primeMusic);
                 once(document.documentElement, "pointerdown", primeMusic);
@@ -764,6 +1040,113 @@
             }
 
             gsap.registerPlugin(ScrollTrigger);
+
+            // About slider
+            (function initAboutSlider() {
+                const section = document.querySelector('#about');
+                const container = section?.querySelector('.about-image');
+                if (!container) return;
+
+                const slides = Array.from(container.querySelectorAll('.about-slide'));
+                const dots = Array.from(container.querySelectorAll('.carousel-dot'));
+                if (!slides.length) return;
+
+                gsap.set(slides, {
+                    autoAlpha: 0,
+                    scale: 1.2,
+                    x: '100%',
+                    rotationY: 25,
+                    y: 0,
+                    transformOrigin: 'center center'
+                });
+                gsap.set(slides[0], {
+                    autoAlpha: 1,
+                    scale: 1,
+                    x: '0%',
+                    rotationY: 0,
+                    y: 0
+                });
+
+                const slideCount = slides.length;
+
+                const tl = gsap.timeline({
+                    defaults: { ease: 'power3.inOut' },
+                    scrollTrigger: {
+                        trigger: section,
+                        start: 'top top',
+                        end: () => `+=${(slideCount - 1) * 100}%`,
+                        scrub: true,
+                        pin: true,
+                        anticipatePin: 1,
+                        invalidateOnRefresh: true
+                    }
+                });
+
+                for (let i = 0; i < slides.length - 1; i++) {
+                    const current = slides[i];
+                    const next = slides[i + 1];
+
+                    tl.to(current, {
+                        autoAlpha: 0,
+                        scale: 0.9,
+                        x: '-80%',
+                        rotationY: -20,
+                        y: -30,
+                        duration: 0.9
+                    })
+                        .fromTo(next, {
+                            autoAlpha: 0,
+                            scale: 1.3,
+                            x: '100%',
+                            rotationY: 30,
+                            y: 50
+                        }, {
+                            autoAlpha: 1,
+                            scale: 1,
+                            x: '0%',
+                            rotationY: 0,
+                            y: 0,
+                            duration: 1.1
+                        }, '<0.1');
+                }
+
+                tl.add(() => {
+                    gsap.set(slides[slideCount - 1], { autoAlpha: 1, scale: 1, x: '0%', rotationY: 0, y: 0 });
+                });
+
+                ScrollTrigger.create({
+                    trigger: section,
+                    start: 'top top',
+                    end: () => `+=${(slideCount - 1) * 100}%`,
+                    scrub: true,
+                    onUpdate: self => {
+                        const idx = Math.min(slideCount - 1, Math.round(self.progress * (slideCount - 1)));
+                        dots.forEach((dot, i) => dot.classList.toggle('active', i === idx));
+                    }
+                });
+
+                container.addEventListener('mousemove', (e) => {
+                    const rect = container.getBoundingClientRect();
+                    const xPercent = ((e.clientX - rect.left) / rect.width - 0.5) * 3;
+                    const yPercent = ((e.clientY - rect.top) / rect.height - 0.5) * 3;
+
+                    gsap.to(slides, {
+                        x: `${xPercent}%`,
+                        y: `${yPercent}%`,
+                        duration: 0.5,
+                        ease: 'power2.out'
+                    });
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    gsap.to(slides, {
+                        x: '0%',
+                        y: '0%',
+                        duration: 0.6,
+                        ease: 'power2.out'
+                    });
+                });
+            })();
 
             let tl = gsap.timeline({
                 defaults: { duration: 1 },
@@ -778,12 +1161,8 @@
             once(video, "loadedmetadata", () => {
                 tl.fromTo(
                     video,
-                    {
-                        currentTime: 0
-                    },
-                    {
-                        currentTime: video.duration || 1
-                    }
+                    { currentTime: 0 },
+                    { currentTime: video.duration || 1 }
                 );
             });
 
@@ -794,7 +1173,7 @@
                         .then((response) => {
                             var blobURL = URL.createObjectURL(response);
                             var t = video.currentTime;
-                            once(document.documentElement, "touchstart", function (e) {
+                            once(document.documentElement, "touchstart", function () {
                                 video.play();
                                 video.pause();
                             });
@@ -804,28 +1183,24 @@
                 }
             }, 1000);
 
-            // Control background music: audible only while the video section is active (keep playing silently otherwise)
             if (music) {
                 ScrollTrigger.create({
                     trigger: "#container",
                     start: "top top",
                     end: "bottom bottom",
                     onEnter: function () {
-                        // Entering video area: ensure playing, start low, then ramp up
-                        music.play().catch(function () { /* ignore */ });
+                        music.play().catch(function () { });
                         gsap.killTweensOf(music);
-                        // make sure we start at a gentle audible level
                         gsap.set(music, { volume: Math.max(music.volume || 0, 0.15) });
                         gsap.to(music, { volume: 0.8, duration: 2, ease: "power2.out", overwrite: true });
                     },
                     onEnterBack: function () {
-                        music.play().catch(function () { /* ignore */ });
+                        music.play().catch(function () { });
                         gsap.killTweensOf(music);
                         gsap.set(music, { volume: Math.max(music.volume || 0, 0.15) });
                         gsap.to(music, { volume: 0.8, duration: 2, ease: "power2.out", overwrite: true });
                     },
                     onLeave: function () {
-                        // Leaving video area: ramp down gently to 0 (keep playing for instant re-entry)
                         gsap.killTweensOf(music);
                         gsap.to(music, { volume: 0, duration: 1.8, ease: "power2.in", overwrite: true });
                     },
@@ -834,38 +1209,29 @@
                         gsap.to(music, { volume: 0, duration: 1.8, ease: "power2.in", overwrite: true });
                     },
                     onRefresh: function (self) {
-                        // Set initial state correctly on load/resize
                         var active = self.isActive;
                         gsap.killTweensOf(music);
                         if (active) {
-                            // If we load inside the video section, start softly then ramp up
-                            music.play().catch(function () { /* ignore */ });
+                            music.play().catch(function () { });
                             gsap.set(music, { volume: 0.15 });
                             gsap.to(music, { volume: 0.8, duration: 2, ease: "power2.out", overwrite: true });
                         } else {
-                            // Outside the section, keep it silent but warmed up
                             gsap.set(music, { volume: 0 });
-                            music.play().catch(function () { /* ignore */ });
+                            music.play().catch(function () { });
                         }
                     }
                 });
 
-                // Optional: pause when tab hidden; resume on visible if in/near the video section
                 document.addEventListener('visibilitychange', function () {
-                    if (document.hidden) {
-                        // You can pause here to save resources if desired; keeping it playing ensures faster resume
-                        // music.pause();
-                    } else {
-                        // Resume if we're inside the video container for instant audio
+                    if (!document.hidden) {
                         var st = ScrollTrigger.getAll().find(function (s) { return s.vars && s.vars.trigger === "#container"; });
                         if (st && st.isActive) {
-                            music.play().catch(function () { /* ignore */ });
+                            music.play().catch(function () { });
                         }
                     }
                 });
             }
 
-            // Text animation timeline
             let textTl = gsap.timeline({
                 scrollTrigger: {
                     trigger: "#container",
@@ -875,77 +1241,43 @@
                 }
             });
 
-            // Main title fade out at 5% scroll
-            textTl.to(".video-text", {
-                opacity: 0,
-                duration: 0.05
-            }, 0);
+            textTl.to(".video-text", { opacity: 0, duration: 0.05 }, 0);
+            textTl.fromTo(".scroll-text-right", { x: 100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.05 }, 0.05)
+                .to(".scroll-text-right", { x: -100, opacity: 0, duration: 0.05 }, 0.25);
+            textTl.fromTo("#text-1", { x: -100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.05 }, 0.35)
+                .to("#text-1", { x: 100, opacity: 0, duration: 0.05 }, 0.55);
+            textTl.fromTo("#text-2", { x: -100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.05 }, 0.60)
+                .to("#text-2", { x: 100, opacity: 0, duration: 0.05 }, 0.80);
+            textTl.fromTo("#text-3", { x: -100, opacity: 0 }, { x: 0, opacity: 1, duration: 0.05 }, 0.85);
 
-            // Right side text (5-30% scroll): slides in from right, stays visible, then fades out to left
-            textTl.fromTo(".scroll-text-right", {
-                x: 100,
-                opacity: 0
-            }, {
-                x: 0,
-                opacity: 1,
-                duration: 0.05
-            }, 0.05)
-                .to(".scroll-text-right", {
-                    x: -100,
-                    opacity: 0,
-                    duration: 0.05
-                }, 0.25);
-
-            // Left text section #1 (35-60% scroll): "Design Philosophy"
-            textTl.fromTo("#text-1", {
-                x: -100,
-                opacity: 0
-            }, {
-                x: 0,
-                opacity: 1,
-                duration: 0.05
-            }, 0.35)
-                .to("#text-1", {
-                    x: 100,
-                    opacity: 0,
-                    duration: 0.05
-                }, 0.55);
-
-            // Left text section #2 (60-85% scroll): "Attention to Detail"
-            textTl.fromTo("#text-2", {
-                x: -100,
-                opacity: 0
-            }, {
-                x: 0,
-                opacity: 1,
-                duration: 0.05
-            }, 0.60)
-                .to("#text-2", {
-                    x: 100,
-                    opacity: 0,
-                    duration: 0.05
-                }, 0.80);
-
-            // Left text section #3 (85-100% scroll): "Sustainable Luxury" - stays until end
-            textTl.fromTo("#text-3", {
-                x: -100,
-                opacity: 0
-            }, {
-                x: 0,
-                opacity: 1,
-                duration: 0.05
-            }, 0.85);
-
-            // Smooth scrolling for navigation links
             $('a[href^="#"]').on('click', function (e) {
                 e.preventDefault();
                 var target = $(this.getAttribute('href'));
                 if (target.length) {
-                    $('html, body').stop().animate({
-                        scrollTop: target.offset().top - 80
-                    }, 1000);
+                    $('html, body').stop().animate({ scrollTop: target.offset().top - 80 }, 1000);
                 }
             });
+
+            // Portfolio reveal
+            (function initPortfolioReveal() {
+                const items = gsap.utils.toArray('#portfolio .portfolio-item');
+                if (!items.length) return;
+
+                gsap.from(items, {
+                    autoAlpha: 0,
+                    x: 150,
+                    duration: 1,
+                    ease: 'power3.out',
+                    stagger: 0.2,
+                    immediateRender: false,
+                    scrollTrigger: {
+                        trigger: '#portfolio',
+                        start: 'top 80%',
+                        end: 'top 20%',
+                        toggleActions: 'play none none none'
+                    }
+                });
+            })();
         });
     </script>
 </body>
