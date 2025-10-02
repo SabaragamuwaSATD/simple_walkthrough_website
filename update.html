@@ -23,6 +23,32 @@
             overflow-x: hidden;
         }
 
+        .logo {
+            /* Square brand container */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: #2c3e50;
+            /* dark background */
+            border: 1px solid #c9a961;
+            /* subtle highlight */
+            border-radius: 6px;
+            /* keep square with soft corners */
+            text-decoration: none;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            /* contain within the square */
+            display: block;
+            padding: 6px;
+            /* breathing room around the mark */
+        }
+
         /* Navigation */
         nav {
             position: fixed;
@@ -30,7 +56,7 @@
             width: 100%;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            padding: 20px 50px;
+            padding: 10px 50px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -38,12 +64,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
-            letter-spacing: 2px;
-        }
+
 
         .nav-links {
             display: flex;
@@ -428,6 +449,15 @@
                 --nav-offset: 36px;
             }
 
+            .logo {
+                width: 36px;
+                height: 36px;
+            }
+
+            .logo img {
+                padding: 5px;
+            }
+
             .text-number {
                 font-size: 44px;
                 top: 10px;
@@ -467,7 +497,9 @@
 <body>
     <!-- Navigation -->
     <nav>
-        <div class="logo">LUXE</div>
+        <a href="#home" class="logo" aria-label="Home">
+            <img src="logo/dm.webp" alt="LUXE Logo" />
+        </a>
         <ul class="nav-links">
             <li><a href="#home">Home</a></li>
             <li><a href="#services">Services</a></li>
@@ -476,6 +508,13 @@
             <li><a href="#contact">Contact</a></li>
         </ul>
     </nav>
+
+    <!-- Background Music (plays only during the video section) -->
+    <!-- Place your music file at videos/music.mp3 or music/calm.mp3; the first existing source will be used -->
+    <audio id="bg-music" preload="auto" loop>
+        <source src="music/calm.mp3" type="audio/mpeg">
+        <source src="music/calm.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- Video Scroll Section -->
     <div id="container">
@@ -654,6 +693,7 @@
             $('video').addClass('video-background');
 
             const video = document.querySelector(".video-background");
+            const music = document.getElementById("bg-music");
             let src = video.currentSrc || video.src;
             console.log(video, src);
 
@@ -671,6 +711,28 @@
                 video.play();
                 video.pause();
             });
+
+            // Prime and warm-up background music for instant entry playback
+            if (music) {
+                // Hint the browser to load buffers early
+                music.preload = 'auto';
+                music.load();
+                music.volume = 0; // start silent; we'll only adjust volume
+                const primeMusic = function () {
+                    music.play()
+                        .then(function () {
+                            // keep playing silently to avoid start-up delay later
+                            music.volume = 0;
+                        })
+                        .catch(function (err) {
+                            // Autoplay might still be blocked until a stronger gesture; safe to ignore here
+                        });
+                };
+                once(document.documentElement, "touchstart", primeMusic);
+                once(document.documentElement, "pointerdown", primeMusic);
+                once(document.documentElement, "click", primeMusic);
+                once(document, "keydown", primeMusic);
+            }
 
             gsap.registerPlugin(ScrollTrigger);
 
@@ -712,6 +774,67 @@
                         });
                 }
             }, 1000);
+
+            // Control background music: audible only while the video section is active (keep playing silently otherwise)
+            if (music) {
+                ScrollTrigger.create({
+                    trigger: "#container",
+                    start: "top top",
+                    end: "bottom bottom",
+                    onEnter: function () {
+                        // Entering video area: ensure playing, start low, then ramp up
+                        music.play().catch(function () { /* ignore */ });
+                        gsap.killTweensOf(music);
+                        // make sure we start at a gentle audible level
+                        gsap.set(music, { volume: Math.max(music.volume || 0, 0.15) });
+                        gsap.to(music, { volume: 0.8, duration: 2, ease: "power2.out", overwrite: true });
+                    },
+                    onEnterBack: function () {
+                        music.play().catch(function () { /* ignore */ });
+                        gsap.killTweensOf(music);
+                        gsap.set(music, { volume: Math.max(music.volume || 0, 0.15) });
+                        gsap.to(music, { volume: 0.8, duration: 2, ease: "power2.out", overwrite: true });
+                    },
+                    onLeave: function () {
+                        // Leaving video area: ramp down gently to 0 (keep playing for instant re-entry)
+                        gsap.killTweensOf(music);
+                        gsap.to(music, { volume: 0, duration: 1.8, ease: "power2.in", overwrite: true });
+                    },
+                    onLeaveBack: function () {
+                        gsap.killTweensOf(music);
+                        gsap.to(music, { volume: 0, duration: 1.8, ease: "power2.in", overwrite: true });
+                    },
+                    onRefresh: function (self) {
+                        // Set initial state correctly on load/resize
+                        var active = self.isActive;
+                        gsap.killTweensOf(music);
+                        if (active) {
+                            // If we load inside the video section, start softly then ramp up
+                            music.play().catch(function () { /* ignore */ });
+                            gsap.set(music, { volume: 0.15 });
+                            gsap.to(music, { volume: 0.8, duration: 2, ease: "power2.out", overwrite: true });
+                        } else {
+                            // Outside the section, keep it silent but warmed up
+                            gsap.set(music, { volume: 0 });
+                            music.play().catch(function () { /* ignore */ });
+                        }
+                    }
+                });
+
+                // Optional: pause when tab hidden; resume on visible if in/near the video section
+                document.addEventListener('visibilitychange', function () {
+                    if (document.hidden) {
+                        // You can pause here to save resources if desired; keeping it playing ensures faster resume
+                        // music.pause();
+                    } else {
+                        // Resume if we're inside the video container for instant audio
+                        var st = ScrollTrigger.getAll().find(function (s) { return s.vars && s.vars.trigger === "#container"; });
+                        if (st && st.isActive) {
+                            music.play().catch(function () { /* ignore */ });
+                        }
+                    }
+                });
+            }
 
             // Text animation timeline
             let textTl = gsap.timeline({
