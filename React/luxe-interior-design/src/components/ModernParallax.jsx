@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 const ModernParallax = () => {
   const containerRef = useRef(null);
   const [scrollY, setScrollY] = useState(0);
+  const [isInView, setIsInView] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -10,6 +11,10 @@ const ModernParallax = () => {
         const rect = containerRef.current.getBoundingClientRect();
         const scrollProgress = -rect.top / (rect.height - window.innerHeight);
         setScrollY(scrollProgress);
+
+        // Check if the parallax section is still in view
+        const sectionBottom = rect.bottom;
+        setIsInView(sectionBottom > 0);
       }
     };
 
@@ -28,6 +33,7 @@ const ModernParallax = () => {
           style={{
             transform: `translateY(${scrollY * 50}px)`,
             transition: "transform 0.1s ease-out",
+            display: isInView ? "block" : "none",
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-transparent to-gray-900 z-10" />
@@ -47,6 +53,7 @@ const ModernParallax = () => {
             })`,
             opacity: Math.max(0, 1 - scrollY * 1.5),
             transition: "transform 0.1s ease-out, opacity 0.1s ease-out",
+            display: isInView ? "flex" : "none",
           }}
         >
           <img
@@ -63,6 +70,7 @@ const ModernParallax = () => {
             transform: `translateY(${scrollY * 200}px)`,
             opacity: Math.max(0, 1 - scrollY * 2),
             transition: "transform 0.1s ease-out, opacity 0.1s ease-out",
+            display: isInView ? "block" : "none",
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-gray-900" />
@@ -75,6 +83,7 @@ const ModernParallax = () => {
             transform: `translateY(${scrollY * 300}px)`,
             opacity: Math.max(0, 1 - scrollY * 1.2),
             transition: "transform 0.1s ease-out, opacity 0.1s ease-out",
+            display: isInView ? "flex" : "none",
           }}
         >
           <div className="text-center px-8">
@@ -102,6 +111,7 @@ const ModernParallax = () => {
           style={{
             opacity: Math.max(0, 1 - scrollY * 3),
             transition: "opacity 0.3s ease-out",
+            display: isInView ? "block" : "none",
           }}
         >
           <div className="flex flex-col items-center gap-2 text-white animate-bounce">
@@ -124,8 +134,8 @@ const ModernParallax = () => {
       </div>
 
       {/* Content Section with Clear Background and Glass Effects */}
-      <div className="relative min-h-screen overflow-hidden">
-        {/* Clear Background Image - No Blur, High Opacity */}
+      <div className="relative h-screen overflow-hidden">
+        {/* Clear Background Image - Fixed within this section only */}
         <div className="absolute inset-0 z-0">
           <img
             src="/images/Agroventures.jpg"
@@ -147,9 +157,9 @@ const ModernParallax = () => {
         </div>
 
         {/* Content with Glass Effects */}
-        <div className="relative z-10 max-w-6xl mx-auto px-8 py-32">
+        <div className="relative z-10 max-w-6xl mx-auto px-8 py-16 h-full flex flex-col justify-center">
           {/* Main Content Cards with Glass Effect */}
-          <div className="grid md:grid-cols-2 gap-8 mb-32">
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
             <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl">
               <h2 className="text-4xl font-bold text-white mb-6 drop-shadow-lg">
                 Innovative Design
@@ -173,7 +183,7 @@ const ModernParallax = () => {
           </div>
 
           {/* Feature Cards with Strong Glass Effect */}
-          <div className="grid md:grid-cols-3 gap-8 mb-20">
+          <div className="grid md:grid-cols-3 gap-6">
             {[
               {
                 title: "Modern Aesthetics",
@@ -193,40 +203,19 @@ const ModernParallax = () => {
             ].map((feature, idx) => (
               <div
                 key={idx}
-                className="bg-white/15 backdrop-blur-xl rounded-2xl p-8 border border-white/30 shadow-2xl hover:bg-white/20 hover:border-white/40 transition-all duration-300 transform hover:scale-105 hover:shadow-3xl"
+                className="bg-white/15 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-2xl hover:bg-white/20 hover:border-white/40 transition-all duration-300 transform hover:scale-105 hover:shadow-3xl"
               >
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-400/80 to-purple-500/80 backdrop-blur-sm rounded-full mb-6 flex items-center justify-center border border-white/30 shadow-lg">
-                  <div className="w-8 h-8 bg-white rounded-full opacity-90 shadow-inner" />
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-400/80 to-purple-500/80 backdrop-blur-sm rounded-full mb-4 flex items-center justify-center border border-white/30 shadow-lg">
+                  <div className="w-6 h-6 bg-white rounded-full opacity-90 shadow-inner" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4 drop-shadow-lg">
+                <h3 className="text-xl font-bold text-white mb-3 drop-shadow-lg">
                   {feature.title}
                 </h3>
-                <p className="text-white/90 drop-shadow-md">
+                <p className="text-white/90 text-sm drop-shadow-md">
                   {feature.description}
                 </p>
               </div>
             ))}
-          </div>
-
-          {/* Call to Action with Glass Effect */}
-          <div className="text-center">
-            <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-12 border border-white/30 shadow-2xl max-w-4xl mx-auto">
-              <h3 className="text-4xl font-bold text-white mb-6 drop-shadow-lg">
-                Ready to Transform Your Space?
-              </h3>
-              <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto drop-shadow-md">
-                Let our expert designers create the perfect interior solution
-                for your home or office.
-              </p>
-              <div className="flex gap-4 justify-center flex-wrap">
-                <button className="px-10 py-4 bg-white/20 backdrop-blur-sm text-white rounded-full font-semibold border border-white/30 hover:bg-white/30 hover:border-white/50 transition-all transform hover:scale-105 shadow-lg">
-                  Get Started
-                </button>
-                <button className="px-10 py-4 bg-transparent border-2 border-white/60 text-white rounded-full font-semibold hover:bg-white/10 hover:border-white/80 transition-all transform hover:scale-105 backdrop-blur-sm">
-                  View Portfolio
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
