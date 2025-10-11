@@ -24,7 +24,7 @@ const ModernParallax = () => {
   }, []);
 
   return (
-    <div className="w-full bg-gray-900">
+    <div className="w-full bg-gray-900 pb-10">
       {/* Hero Section with Parallax */}
       <div ref={containerRef} className="relative h-[200vh] overflow-hidden">
         {/* Background Layer - Slowest */}
