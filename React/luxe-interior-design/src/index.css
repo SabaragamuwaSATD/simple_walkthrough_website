@@ -3,3 +3,210 @@
 @tailwind utilities;
 
 /* Custom styles can be added below */
+/* Custom global styles */
+body {
+  @apply font-serif text-gray-800 overflow-x-hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-light;
+}
+
+a {
+  @apply text-gray-800 no-underline;
+}
+
+a:hover {
+  @apply text-yellow-600;
+}
+
+.container {
+  @apply mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.section-title {
+  @apply text-4xl text-center mb-16 text-gray-800 font-light tracking-wide;
+}
+
+.service-card {
+  @apply p-12 bg-gray-100 rounded-lg text-center transition-transform transform hover:-translate-y-2 hover:shadow-lg;
+}
+
+.portfolio-item {
+  @apply relative overflow-hidden rounded-lg cursor-pointer;
+}
+
+.portfolio-info {
+  @apply absolute bottom-0 left-0 right-0 p-8 text-white transform translate-y-20 opacity-0 transition-all duration-300;
+}
+
+.portfolio-item:hover .portfolio-info {
+  @apply translate-y-0 opacity-100;
+}
+
+/* Hero Text Animations with proper backgrounds */
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes highlight {
+  0% {
+    transform: translateX(-100%) skewX(-12deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.9;
+    background: linear-gradient(
+      135deg,
+      rgba(201, 169, 97, 0.8),
+      rgba(212, 184, 114, 0.8)
+    );
+  }
+  100% {
+    transform: translateX(100%) skewX(-12deg);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes text-glow {
+  0%,
+  100% {
+    text-shadow: 0 0 10px rgba(201, 169, 97, 0.5),
+      0 0 20px rgba(201, 169, 97, 0.3), 0 0 30px rgba(201, 169, 97, 0.2);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(201, 169, 97, 0.8),
+      0 0 30px rgba(201, 169, 97, 0.6), 0 0 40px rgba(201, 169, 97, 0.4),
+      0 0 50px rgba(201, 169, 97, 0.2);
+  }
+}
+
+@keyframes underline-expand {
+  0% {
+    width: 0;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+/* Enhanced animation classes with better visibility */
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+.animate-highlight {
+  animation: highlight 2.5s ease-in-out 1s infinite;
+  position: relative;
+}
+
+.animate-highlight::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(201, 169, 97, 0.3),
+    rgba(212, 184, 114, 0.3)
+  );
+  transform: skewX(-12deg);
+  animation: highlight 2.5s ease-in-out 1s infinite;
+  z-index: -1;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(201, 169, 97, 0.8) 0%,
+    rgba(212, 184, 114, 1) 25%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(212, 184, 114, 1) 75%,
+    rgba(201, 169, 97, 0.8) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+
+.animate-text-glow {
+  animation: text-glow 2s ease-in-out infinite;
+  background: linear-gradient(45deg, #ffffff, #c9a961);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.animate-underline-expand {
+  animation: underline-expand 3s ease-in-out 2s infinite;
+}
+
+/* Delay classes */
+.delay-100 {
+  animation-delay: 0.1s;
+}
+
+.delay-300 {
+  animation-delay: 0.3s;
+}
+
+.delay-500 {
+  animation-delay: 0.5s;
+}
+
+.delay-700 {
+  animation-delay: 0.7s;
+}
+
+/* Additional utility classes for better visibility */
+.text-shadow-gold {
+  text-shadow: 0 2px 4px rgba(201, 169, 97, 0.3);
+}
+
+.bg-highlight {
+  background: linear-gradient(
+    135deg,
+    rgba(201, 169, 97, 0.2),
+    rgba(212, 184, 114, 0.2)
+  );
+  padding: 0.1em 0.3em;
+  border-radius: 0.2em;
+}
+
+/* Ensure text is visible on video background */
+.hero-text-overlay {
+  background: #595f3f50;
+  backdrop-filter: blur(100px);
+  border-radius: 8px;
+  padding: 1rem;
+}

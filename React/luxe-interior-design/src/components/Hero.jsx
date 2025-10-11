@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+// import Model from "./Model";
 
 // Register the plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -14,6 +15,8 @@ const Hero = () => {
   const text2Ref = useRef(null);
   const text3Ref = useRef(null);
   const musicRef = useRef(null);
+
+  // const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -147,6 +150,9 @@ const Hero = () => {
         start: "top top",
         end: "bottom bottom",
         scrub: true,
+        // onUpdate: (self) => {
+        //   setScrollProgress(self.progress);
+        // },
       },
     });
 
@@ -236,6 +242,12 @@ const Hero = () => {
         <source src="/music/calm.mp3" type="audio/mpeg" />
       </audio>
 
+      <div className="absolute top-0 left-0 w-full h-full z-[3] pointer-events-none">
+        {/* <Model
+          scrollProgress={scrollProgress} // Pass scroll progress from your GSAP timeline
+          isVisible={true}
+        /> */}
+      </div>
       <div ref={containerRef} className="relative h-[400vh] mb-10">
         <div className="sticky top-0 h-screen w-full overflow-hidden">
           <video
@@ -262,35 +274,61 @@ const Hero = () => {
           </video>
 
           <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-15 flex items-center justify-center text-white z-[2]">
-            <div ref={videoTextRef} className="text-center p-5">
-              <h1 className="text-[72px] mb-5 font-light tracking-[3px] leading-tight">
-                Transform Your Space
+            <div
+              ref={videoTextRef}
+              className="text-center p-5 hero-text-overlay"
+            >
+              <h1 className="text-[32px] md:text-[56px] lg:text-[72px] mb-3 md:mb-5 font-light tracking-[1px] md:tracking-[3px] leading-tight px-4 relative overflow-hidden text-shadow-gold">
+                <span className="inline-block animate-fade-in-up delay-100">
+                  Transform
+                </span>
+                <span className="inline-block animate-fade-in-up delay-300 mx-2 md:mx-3 relative animate-highlight bg-highlight">
+                  <span className="relative z-10">Your</span>
+                </span>
+                <span className="inline-block animate-fade-in-up delay-500 relative">
+                  <span className="relative z-10 animate-shimmer">Space</span>
+                </span>
               </h1>
-              <p className="text-2xl font-light">
-                Luxury Interior Design That Reflects Your Style
+              <p className="text-base md:text-xl lg:text-2xl font-light px-4 opacity-0 animate-fade-in-up delay-700 relative text-shadow-gold">
+                <span className="inline-block hover:text-[#c9a961] transition-colors duration-300 cursor-default">
+                  Luxury
+                </span>
+                <span className="mx-1 md:mx-2">Interior Design That</span>
+                <span className="inline-block relative">
+                  <span className="hover:text-[#c9a961] transition-colors duration-300 cursor-default">
+                    Reflects
+                  </span>
+                </span>
+                <span className="mx-1 md:mx-2">Your</span>
+                <span className="inline-block relative">
+                  <span className="animate-text-glow">Style</span>
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#c9a961] to-transparent opacity-0 animate-underline-expand"></span>
+                </span>
               </p>
             </div>
 
+            {/* Right scroll text - responsive */}
             <div
               ref={scrollTextRightRef}
-              className="absolute right-20 top-1/2 transform -translate-y-1/2 max-w-[400px] opacity-0 z-[4] bg-[#f5efe6] text-[#2c3e50] px-6 py-5 rounded-xl shadow-2xl"
+              className="absolute right-5 md:right-10 lg:right-20 top-1/2 transform -translate-y-1/2 max-w-[calc(100%-40px)] md:max-w-[350px] lg:max-w-[400px] opacity-0 z-[4] bg-[#f5efe6] text-[#2c3e50] px-4 md:px-6 py-4 md:py-5 rounded-xl shadow-2xl"
               style={{
                 top: "calc(50% + 48px)",
                 boxShadow: "0 8px 24px rgba(0, 0, 0, 0.18)",
               }}
             >
-              <h2 className="text-[42px] mb-5 font-light leading-[1.2] text-[#2c3e50]">
+              <h2 className="text-[28px] md:text-[36px] lg:text-[42px] mb-3 md:mb-5 font-light leading-[1.2] text-[#2c3e50]">
                 Timeless Elegance
               </h2>
-              <p className="text-lg leading-relaxed font-light text-[#2c3e50]">
+              <p className="text-sm md:text-base lg:text-lg leading-relaxed font-light text-[#2c3e50]">
                 We believe in creating spaces that stand the test of time,
                 blending classic sophistication with modern functionality.
               </p>
             </div>
           </div>
 
+          {/* Left scroll text sections - responsive */}
           <div
-            className="absolute left-20 opacity-90 z-[2] text-white max-w-[350px]"
+            className="absolute left-5 md:left-10 lg:left-20 opacity-90 z-[2] text-white max-w-[calc(100%-40px)] md:max-w-[400px] lg:max-w-[450px]"
             style={{
               top: "calc(50% + 30px)",
               transform: "translateY(-50%)",
@@ -298,18 +336,18 @@ const Hero = () => {
           >
             <div
               ref={text1Ref}
-              className="mb-[10px] opacity-0 bg-[#f5efe6] px-6 pt-[84px] pb-[22px] rounded-xl relative shadow-2xl"
+              className="mb-[30px] md:mb-[10px] opacity-0 bg-[#f5efe6] px-4 md:px-6 pt-[60px] md:pt-[84px] pb-[18px] md:pb-[22px] rounded-xl relative shadow-2xl"
               style={{
                 boxShadow: "0 8px 24px rgba(0, 0, 0, 0.18)",
               }}
             >
-              <div className="absolute top-3 left-6 text-[56px] font-bold leading-none text-[#c9a961] m-0">
+              <div className="absolute top-2 md:top-3 left-4 md:left-6 text-[40px] md:text-[56px] font-bold leading-none text-[#c9a961] m-0">
                 01
               </div>
-              <h3 className="text-4xl mb-4 font-light tracking-[2px] text-[#2c3e50]">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl mb-2 md:mb-4 font-light tracking-[2px] text-[#2c3e50]">
                 Design Philosophy
               </h3>
-              <p className="text-base leading-[1.8] font-light text-[#2c3e50]">
+              <p className="text-sm md:text-base leading-[1.6] md:leading-[1.8] font-light text-[#2c3e50]">
                 Every project begins with understanding your unique vision and
                 lifestyle, creating personalized spaces that tell your story.
               </p>
@@ -317,18 +355,18 @@ const Hero = () => {
 
             <div
               ref={text2Ref}
-              className="mb-[20px] opacity-0 bg-[#f5efe6] px-6 pt-[84px] pb-[22px] rounded-xl relative shadow-2xl"
+              className="mb-[30px] md:mb-[20px] opacity-0 bg-[#f5efe6] px-4 md:px-6 pt-[60px] md:pt-[84px] pb-[18px] md:pb-[22px] rounded-xl relative shadow-2xl"
               style={{
                 boxShadow: "0 8px 24px rgba(0, 0, 0, 0.18)",
               }}
             >
-              <div className="absolute top-3 left-6 text-[56px] font-bold leading-none text-[#c9a961] m-0">
+              <div className="absolute top-2 md:top-3 left-4 md:left-6 text-[40px] md:text-[56px] font-bold leading-none text-[#c9a961] m-0">
                 02
               </div>
-              <h3 className="text-4xl mb-4 font-light tracking-[2px] text-[#2c3e50]">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl mb-2 md:mb-4 font-light tracking-[2px] text-[#2c3e50]">
                 Attention to Detail
               </h3>
-              <p className="text-base leading-[1.8] font-light text-[#2c3e50]">
+              <p className="text-sm md:text-base leading-[1.6] md:leading-[1.8] font-light text-[#2c3e50]">
                 From custom millwork to curated finishes, we obsess over every
                 element to ensure perfection in execution.
               </p>
@@ -336,18 +374,18 @@ const Hero = () => {
 
             <div
               ref={text3Ref}
-              className="opacity-0 bg-[#f5efe6] px-6 pt-[84px] pb-[22px] rounded-xl relative shadow-2xl"
+              className="opacity-0 bg-[#f5efe6] px-4 md:px-6 pt-[60px] md:pt-[84px] pb-[18px] md:pb-[22px] rounded-xl relative shadow-2xl"
               style={{
                 boxShadow: "0 8px 24px rgba(0, 0, 0, 0.18)",
               }}
             >
-              <div className="absolute top-3 left-6 text-[56px] font-bold leading-none text-[#c9a961] m-0">
+              <div className="absolute top-2 md:top-3 left-4 md:left-6 text-[40px] md:text-[56px] font-bold leading-none text-[#c9a961] m-0">
                 03
               </div>
-              <h3 className="text-4xl mb-4 font-light tracking-[2px] text-[#2c3e50]">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl mb-2 md:mb-4 font-light tracking-[2px] text-[#2c3e50]">
                 Sustainable Luxury
               </h3>
-              <p className="text-base leading-[1.8] font-light text-[#2c3e50]">
+              <p className="text-sm md:text-base leading-[1.6] md:leading-[1.8] font-light text-[#2c3e50]">
                 Beautiful design shouldn't compromise our planet. We integrate
                 eco-friendly materials and practices in every project.
               </p>

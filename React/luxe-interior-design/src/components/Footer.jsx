@@ -5,9 +5,7 @@ const Footer = () => {
     <footer className="bg-[#2c3e50] text-white py-16 px-12">
       <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
         <div className="footer-section">
-          <h4 className="text-xl mb-5 text-[#c9a961] font-normal">
-            LUXE Studio
-          </h4>
+          <h4 className="text-xl mb-5 text-[#c9a961] font-normal">DM Studio</h4>
           <p className="text-[#bbb] leading-[1.8] text-base">
             Creating beautiful spaces that inspire and delight. Your vision, our
             expertise.
@@ -40,25 +38,33 @@ const Footer = () => {
           <h4 className="text-xl mb-5 text-[#c9a961] font-normal">Follow Us</h4>
           <div className="flex flex-col gap-2.5">
             <a
-              href="#"
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-[#bbb] hover:text-[#c9a961] transition-colors duration-300 block mb-2.5 text-base"
             >
               Instagram
             </a>
             <a
-              href="#"
+              href="https://pinterest.com"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-[#bbb] hover:text-[#c9a961] transition-colors duration-300 block mb-2.5 text-base"
             >
               Pinterest
             </a>
             <a
-              href="#"
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-[#bbb] hover:text-[#c9a961] transition-colors duration-300 block mb-2.5 text-base"
             >
               Facebook
             </a>
             <a
-              href="#"
+              href="https://linkedin.com"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-[#bbb] hover:text-[#c9a961] transition-colors duration-300 block mb-2.5 text-base"
             >
               LinkedIn
