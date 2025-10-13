@@ -21,17 +21,17 @@ const slides = [
     subtitle: "Luxury Interiors",
     description:
       "Lorem ipsum dolor sit amet consectetur. Sem sed ut est augue diam vulputate. Sit quam morbi egestas in sagittis adipiscing arcu.",
-    mainImage:
-      "https://images.unsplash.com/photo-1600210492493-0946911123ea?w=800&h=600&fit=crop",
+    mainImage: "/images/Viana.jpg",
     thumbnails: [
-      "https://images.unsplash.com/photo-1600210492493-0946911123ea?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600566753151-384129cf4e3e?w=800&h=600&fit=crop",
+      "/images/Viana.jpg",
+      "/images/Viana2.jpg",
+      "/images/Viana3.jpg",
+      "/images/Viana4.jpg",
     ],
   },
   {
     id: 3,
-    title: "Luxor",
+    title: "Sebsa",
     subtitle: "Urban Design",
     description:
       "Lorem ipsum dolor sit amet consectetur. Sem sed ut est augue diam vulputate. Sit quam morbi egestas in sagittis adipiscing arcu.",
@@ -45,16 +45,16 @@ const slides = [
   },
   {
     id: 4,
-    title: "Nova",
-    subtitle: "Contemporary Spaces",
+    title: "SEBSA",
+    subtitle: "Office Space",
     description:
       "Lorem ipsum dolor sit amet consectetur. Sem sed ut est augue diam vulputate. Sit quam morbi egestas in sagittis adipiscing arcu.",
-    mainImage:
-      "https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=800&h=600&fit=crop",
+    mainImage: "/images/SEBSA1.jpg",
     thumbnails: [
-      "https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600585154363-67eb9e2e2099?w=800&h=600&fit=crop",
+      "/images/SEBSA1.jpg",
+      "/images/SEBSA2.jpg",
+      "/images/SEBSA3.jpg",
+      "/images/SEBSA4.jpg",
     ],
   },
 ];

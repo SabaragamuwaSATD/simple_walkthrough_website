@@ -138,7 +138,7 @@ const ModernParallax = () => {
         {/* Clear Background Image - Fixed within this section only */}
         <div className="absolute inset-0 z-0">
           <img
-            src="/images/Agroventures.jpg"
+            src="/images/DMOffice3.jpg"
             alt="Interior Background"
             className="w-full h-full object-cover"
             onError={(e) => {
@@ -205,9 +205,10 @@ const ModernParallax = () => {
                 key={idx}
                 className="bg-white/15 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-2xl hover:bg-white/20 hover:border-white/40 transition-all duration-300 transform hover:scale-105 hover:shadow-3xl"
               >
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-400/80 to-purple-500/80 backdrop-blur-sm rounded-full mb-4 flex items-center justify-center border border-white/30 shadow-lg">
-                  <div className="w-6 h-6 bg-white rounded-full opacity-90 shadow-inner" />
+                <div className="w-12 h-12 bg-gradient-to-br from-red-600/90 to-gray-800 backdrop-blur-sm rounded-full mb-4 flex items-center justify-center border border-red-500/50 shadow-lg">
+                  <div className="w-6 h-6 backdrop-blur-md rounded-full border border-white/60 bg-white/40 shadow-inner" />
                 </div>
+
                 <h3 className="text-xl font-bold text-white mb-3 drop-shadow-lg">
                   {feature.title}
                 </h3>
