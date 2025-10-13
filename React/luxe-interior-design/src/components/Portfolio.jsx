@@ -7,12 +7,12 @@ const slides = [
     subtitle: "Modern Architecture",
     description:
       "Lorem ipsum dolor sit amet consectetur. Sem sed ut est augue diam vulputate. Sit quam morbi egestas in sagittis adipiscing arcu.",
-    mainImage:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop",
+    mainImage: "/images/CLB1.jpg",
     thumbnails: [
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop",
+      "/images/CLB1.jpg",
+      "/images/CLB2.jpg",
+      "/images/CLB3.jpg",
+      "/images/CLB4.jpg",
     ],
   },
   {
@@ -31,16 +31,16 @@ const slides = [
   },
   {
     id: 3,
-    title: "Sebsa",
+    title: "nature's Secrets",
     subtitle: "Urban Design",
     description:
       "Lorem ipsum dolor sit amet consectetur. Sem sed ut est augue diam vulputate. Sit quam morbi egestas in sagittis adipiscing arcu.",
-    mainImage:
-      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800&h=600&fit=crop",
+    mainImage: "/images/NS1.jpg",
     thumbnails: [
-      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600573472591-ee6b68d14c68?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop",
+      "/images/NS1.jpg",
+      "/images/NS2.jpg",
+      "/images/NS3.jpg",
+      "/images/NS4.jpg",
     ],
   },
   {
