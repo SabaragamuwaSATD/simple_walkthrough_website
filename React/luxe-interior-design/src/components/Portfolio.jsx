@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 const slides = [
   {
@@ -59,7 +60,8 @@ const slides = [
   },
 ];
 
-export default function AdvancedSlider() {
+export default function Portfolio() {
+  const navigate = useNavigate();
   const [activeSlide, setActiveSlide] = useState(0);
   const [activeThumbnail, setActiveThumbnail] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -170,7 +172,9 @@ export default function AdvancedSlider() {
   const dragOffset = isDragging ? (currentX - startX) / 10 : 0;
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-black">
+    <div className="relative bg-white">
+      {/* Portfolio Slider */}
+      <div className="relative w-full h-screen overflow-hidden bg-white">
       {/* Animated Background */}
       <div className="absolute inset-0">
         <div
@@ -180,8 +184,8 @@ export default function AdvancedSlider() {
             backgroundImage: `url(${currentSlide.thumbnails[activeThumbnail]})`,
             transform: isSlideTransitioning ? "scale(1.15)" : "scale(1.05)",
             filter: isSlideTransitioning
-              ? "blur(10px) brightness(0.7)"
-              : "blur(0px) brightness(1)",
+              ? "brightness(0.7)"
+              : "brightness(1)",
             transition: "all 1.5s cubic-bezier(0.4, 0.0, 0.2, 1)",
           }}
         />
@@ -217,7 +221,7 @@ export default function AdvancedSlider() {
         }}
       >
         {/* Left Content */}
-        <div className="w-full lg:w-5/12 text-white space-y-6 pr-8">
+        <div className="w-full lg:w-5/12 text-gray-900 space-y-6 pr-8">
           {/* Slide Counter */}
           <div
             className="flex items-center gap-4 text-sm font-medium tracking-wider mb-2"
@@ -229,11 +233,11 @@ export default function AdvancedSlider() {
             }}
           >
             <div className="flex items-center gap-2">
-              <span className="text-white font-bold">
+              <span className="text-gray-900 font-bold">
                 {String(activeSlide + 1).padStart(2, "0")}
               </span>
-              <div className="w-12 h-px bg-gradient-to-r from-white to-transparent" />
-              <span className="text-white/50">
+              <div className="w-12 h-px bg-gradient-to-r from-gray-900 to-transparent" />
+              <span className="text-gray-600">
                 {String(slides.length).padStart(2, "0")}
               </span>
             </div>
@@ -241,7 +245,7 @@ export default function AdvancedSlider() {
 
           {/* Title with Animation */}
           <h1
-            className="text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-tight text-white drop-shadow-2xl"
+            className="text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-tight text-gray-900 drop-shadow-sm"
             key={`title-${activeSlide}`}
             style={{
               animation: isSlideTransitioning
@@ -255,7 +259,7 @@ export default function AdvancedSlider() {
 
           {/* Subtitle */}
           <div
-            className="text-white/90 text-base font-medium tracking-wide"
+            className="text-gray-700 text-base font-medium tracking-wide"
             key={`subtitle-${activeSlide}`}
             style={{
               animation: isSlideTransitioning
@@ -268,32 +272,49 @@ export default function AdvancedSlider() {
 
           {/* Description */}
           <p
-            className="text-white/80 text-base lg:text-lg leading-relaxed max-w-lg"
+            className="text-gray-600 text-base lg:text-lg leading-relaxed max-w-lg"
             key={`desc-${activeSlide}`}
             style={{
               animation: isSlideTransitioning
                 ? "fadeOut 0.4s ease-in"
                 : "fadeIn 1s ease-out 0.3s both",
-              textShadow: "0 2px 10px rgba(0,0,0,0.5)",
             }}
           >
             {currentSlide.description}
           </p>
 
-          {/* CTA Button */}
-          <button
-            className="group relative px-8 py-4 bg-red-600 hover:bg-red-700 rounded-lg overflow-hidden transition-all duration-500 ease-out hover:shadow-lg hover:shadow-red-500/50 hover:scale-105 mt-4"
-            style={{
-              animation: isSlideTransitioning
-                ? "fadeOut 0.4s ease-in"
-                : "fadeIn 1s ease-out 0.45s both",
-            }}
-          >
-            <span className="relative z-10 font-semibold tracking-wide text-white">
-              Explore Now
-            </span>
-            <div className="absolute inset-0 bg-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          </button>
+          {/* CTA Buttons */}
+          <div className="flex gap-4 mt-4">
+            <button
+              className="group relative px-8 py-4 bg-red-600 hover:bg-red-700 rounded-lg overflow-hidden transition-all duration-500 ease-out hover:shadow-lg hover:shadow-red-500/50 hover:scale-105"
+              style={{
+                animation: isSlideTransitioning
+                  ? "fadeOut 0.4s ease-in"
+                  : "fadeIn 1s ease-out 0.45s both",
+              }}
+            >
+              <span className="relative z-10 font-semibold tracking-wide text-white">
+                Explore Now
+              </span>
+              <div className="absolute inset-0 bg-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </button>
+
+            <button
+              onClick={() => navigate('/products?scrollToHeader=true')}
+              className="group relative px-8 py-4 bg-gray-800 hover:bg-gray-900 rounded-lg overflow-hidden transition-all duration-500 ease-out hover:shadow-lg hover:shadow-gray-500/50 hover:scale-105"
+              style={{
+                animation: isSlideTransitioning
+                  ? "fadeOut 0.4s ease-in"
+                  : "fadeIn 1s ease-out 0.5s both",
+              }}
+            >
+              <span className="relative z-10 font-semibold tracking-wide text-white">
+                View More →
+              </span>
+              <div className="absolute inset-0 bg-gray-900 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            </button>
+          </div>
 
           {/* Progress Bar */}
           <div
@@ -307,7 +328,7 @@ export default function AdvancedSlider() {
               <button
                 key={`progress-bar-${activeSlide}-${idx}`}
                 type="button"
-                className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden cursor-pointer backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white"
+                className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-white"
                 aria-label={`Go to thumbnail ${idx + 1}`}
                 tabIndex={0}
                 onClick={() => handleThumbnailClick(idx)}
@@ -353,7 +374,7 @@ export default function AdvancedSlider() {
             {/* Navigation Arrows */}
             <button
               onClick={handlePrevious}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-20 z-30 w-12 h-12 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white hover:bg-white/30 transition-all duration-500 ease-out hover:scale-110"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-20 z-30 w-12 h-12 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-500 ease-out hover:scale-110"
             >
               <svg
                 className="w-6 h-6"
@@ -372,7 +393,7 @@ export default function AdvancedSlider() {
 
             <button
               onClick={handleNext}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-20 z-30 w-12 h-12 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white hover:bg-white/30 transition-all duration-500 ease-out hover:scale-110"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-20 z-30 w-12 h-12 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-500 ease-out hover:scale-110"
             >
               <svg
                 className="w-6 h-6"
@@ -530,7 +551,7 @@ export default function AdvancedSlider() {
                     </div>
                     {/* Card Shadow */}
                     <div
-                      className={`absolute inset-0 -z-10 rounded-3xl blur-2xl transition-all duration-1000 ${
+                      className={`absolute inset-0 -z-10 rounded-3xl transition-all duration-1000 ${
                         isActive ? "bg-white/30" : "bg-black/60"
                       }`}
                       style={{
@@ -659,6 +680,7 @@ export default function AdvancedSlider() {
           }
         }
       `}</style>
+      </div>
     </div>
   );
 }
