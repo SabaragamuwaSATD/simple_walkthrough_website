@@ -32,7 +32,7 @@ const slides = [
   },
   {
     id: 3,
-    title: "nature's Secrets",
+    title: "Nature's Secrets",
     subtitle: "Urban Design",
     description:
       "Lorem ipsum dolor sit amet consectetur. Sem sed ut est augue diam vulputate. Sit quam morbi egestas in sagittis adipiscing arcu.",

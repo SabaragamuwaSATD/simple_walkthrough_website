@@ -59,7 +59,7 @@ const ModernParallax = () => {
           <img
             src="/images/DmOffice.jpg"
             alt="Office Interior Detail"
-            className="w-4/5 h-4/5 object-cover rounded-3xl shadow-2xl"
+            className="w-[95%] h-4/5 object-cover rounded-3xl shadow-2xl"
           />
         </div>
 
@@ -87,9 +87,9 @@ const ModernParallax = () => {
           }}
         >
           <div className="text-center px-8">
-            <h1 className="text-6xl md:text-8xl font-bold text-white mb-6 tracking-tight">
+            {/* <h1 className="text-6xl md:text-8xl font-bold text-white mb-6 tracking-tight">
               DM Interior
-            </h1>
+            </h1> */}
             <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-8">
               Experience luxury living with our premium interior design
               solutions
@@ -164,21 +164,21 @@ const ModernParallax = () => {
               <h2 className="text-4xl font-bold text-white mb-6 drop-shadow-lg">
                 Innovative Design
               </h2>
-              <p className="text-white/90 text-lg leading-relaxed drop-shadow-md">
+              {/* <p className="text-white/90 text-lg leading-relaxed drop-shadow-md">
                 Our interior designs combine elegance with functionality,
                 creating environments that inspire creativity and comfort. Every
                 detail is carefully crafted to enhance your living experience.
-              </p>
+              </p> */}
             </div>
             <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 shadow-2xl">
               <h2 className="text-4xl font-bold text-white mb-6 drop-shadow-lg">
                 Luxury Experience
               </h2>
-              <p className="text-white/90 text-lg leading-relaxed drop-shadow-md">
+              {/* <p className="text-white/90 text-lg leading-relaxed drop-shadow-md">
                 From premium materials to sophisticated lighting solutions,
                 every element works in harmony to create spaces where luxury
                 meets practicality and style exceeds expectations.
-              </p>
+              </p> */}
             </div>
           </div>
 
@@ -187,18 +187,18 @@ const ModernParallax = () => {
             {[
               {
                 title: "Modern Aesthetics",
-                description:
-                  "Contemporary design elements that create stunning visual impact",
+                // description:
+                //   "Contemporary design elements that create stunning visual impact",
               },
               {
                 title: "Premium Materials",
-                description:
-                  "Carefully selected high-quality materials for lasting beauty",
+                // description:
+                //   "Carefully selected high-quality materials for lasting beauty",
               },
               {
                 title: "Custom Solutions",
-                description:
-                  "Tailored designs that perfectly match your lifestyle and preferences",
+                // description:
+                //   "Tailored designs that perfectly match your lifestyle and preferences",
               },
             ].map((feature, idx) => (
               <div
