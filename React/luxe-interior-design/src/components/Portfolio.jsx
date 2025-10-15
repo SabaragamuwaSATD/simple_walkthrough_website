@@ -172,7 +172,7 @@ export default function Portfolio() {
   const dragOffset = isDragging ? (currentX - startX) / 10 : 0;
 
   return (
-    <div className="relative bg-white">
+    <div className="relative bg-white z-10">
       {/* Portfolio Slider */}
       <div className="relative w-full h-screen overflow-hidden bg-white">
         {/* Animated Background */}
@@ -272,7 +272,7 @@ export default function Portfolio() {
 
             {/* Description */}
             <p
-              className="text-white text-base lg:text-lg leading-relaxed max-w-lg"
+              className="text-white text-base lg:text-lg leading-relaxed max-w-lg flex gap-4 mt-4 ml-30 sm:ml-20"
               key={`desc-${activeSlide}`}
               style={{
                 animation: isSlideTransitioning
@@ -284,10 +284,10 @@ export default function Portfolio() {
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex gap-4 mt-4">
+            <div className="flex gap-4 mt-4 ml-30 sm:ml-20">
               <button
                 onClick={() => navigate("/products?scrollToHeader=true")}
-                className="group relative px-8 py-4 bg-red-600 hover:bg-red-700 rounded-lg overflow-hidden transition-all duration-500 ease-out hover:shadow-lg hover:shadow-red-500/50 hover:scale-105"
+                className="group relative px-8 py-4 bg-red-600 hover:bg-red-700 rounded-lg overflow-hidden transition-all duration-500 ease-out hover:shadow-lg hover:shadow-red-500/50 hover:scale-105 origin-left"
                 style={{
                   animation: isSlideTransitioning
                     ? "fadeOut 0.4s ease-in"
