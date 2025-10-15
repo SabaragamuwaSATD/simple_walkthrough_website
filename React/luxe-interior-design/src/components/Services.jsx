@@ -10,36 +10,42 @@ const servicesData = [
     title: "Residential Design",
     description:
       "Create stunning living spaces that perfectly balance aesthetics and functionality for your home.",
+    image: "/images/resident.jpeg",
   },
   {
     icon: "🏢",
     title: "Commercial Spaces",
     description:
       "Professional office and retail environments designed to enhance productivity and brand identity.",
+    image: "/images/commercial.jpg",
   },
   {
     icon: "💡",
     title: "Lighting Design",
     description:
       "Strategic lighting solutions that transform ambiance and highlight architectural features.",
+    image: "/images/Lighting.jpg",
   },
   {
     icon: "🎨",
     title: "Color Consultation",
     description:
       "Expert color palettes that create harmony and express your unique personality.",
+    image: "/images/NS1.jpg",
   },
   {
     icon: "🪑",
     title: "Custom Furniture",
     description:
       "Bespoke furniture pieces crafted to fit your space and complement your design vision.",
+    image: "/images/furniture.jpg",
   },
   {
     icon: "🖼️",
     title: "Art Curation",
     description:
       "Carefully selected artwork and decor to complete your interior design narrative.",
+    image: "/images/art.jpeg",
   },
 ];
 
@@ -197,9 +203,19 @@ const Services = () => {
               boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
             }}
           >
-            <div className="service-icon text-[48px] mb-5 text-[#c9a961]">
+            {service.image && (
+              <div className="mb-6 -mx-12 -mt-12">
+                <img
+                  src={service.image}
+                  alt={service.title}
+                  className="w-full h-48 object-cover"
+                />
+              </div>
+            )}
+
+            {/* <div className="service-icon text-[48px] mb-5 text-[#c9a961]">
               {service.icon}
-            </div>
+            </div> */}
             <h3 className="service-title text-2xl mb-4 text-[#2c3e50]">
               {service.title}
             </h3>

@@ -3,21 +3,32 @@ import React from "react";
 const Navbar = () => {
   return (
     <nav className="fixed top-0 w-full bg-black/40 backdrop-blur-lg p-4 flex justify-between items-center shadow-lg z-50 border-b border-white/10">
-      <a
-        href="#home"
-        className="logo flex items-center justify-center w-11 h-11 bg-gray-900 border border-red-500 rounded-lg"
-      >
-        <img
-          src="/logo/dm.webp"
-          alt="LUXE Logo"
-          className="w-full h-full object-contain p-1"
-        />
-      </a>
+      {/* Left group: logo + company name */}
+      <div className="flex items-center gap-3">
+        <a
+          href="#home"
+          className="logo flex items-center justify-center w-11 h-11 bg-gray-900 border border-red-500 rounded-lg"
+        >
+          <img
+            src="/logo/dm.webp"
+            alt="DM Interior Studio Logo"
+            className="w-full h-full object-contain p-1"
+          />
+        </a>
+        <a
+          href="#home"
+          className="text-white text-sm md:text-base tracking-wide hover:text-red-500 transition-colors duration-300"
+        >
+          DM Interior Studio
+        </a>
+      </div>
+
       <div className="menu-toggle cursor-pointer flex flex-col gap-1 md:hidden">
         <span className="block w-6 h-0.5 bg-white"></span>
         <span className="block w-6 h-0.5 bg-white"></span>
         <span className="block w-6 h-0.5 bg-white"></span>
       </div>
+
       <ul className="nav-links hidden md:flex gap-10">
         <li>
           <a
