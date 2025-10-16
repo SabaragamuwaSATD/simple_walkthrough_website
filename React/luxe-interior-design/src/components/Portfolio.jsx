@@ -475,7 +475,7 @@ export default function App() {
                 animation: isSlideTransitioning
                   ? "slideOutRight 0.6s ease-in"
                   : "slideInLeft 1s cubic-bezier(0.16, 1, 0.3, 1)",
-                textShadow: "0 4px 20px rgba(0,0,0,0.5)",
+                textShadow: "0 4px 20px rgba(0,0,0,0.7)",
               }}
             >
               {currentSlide.title}
@@ -487,20 +487,9 @@ export default function App() {
               key={`subtitle-${activeSlide}`}
               style={{
                 animation: isSlideTransitioning
-                  ? "fadeOut 0.4s ease-in"
-                  : "fadeIn 1s ease-out 0.15s both",
-              }}
-            >
-              {currentSlide.subtitle}
-            </div>
-            {/* Subtitle */}
-            <div
-              className="text-white text-base font-medium tracking-wide"
-              key={`subtitle-${activeSlide}`}
-              style={{
-                animation: isSlideTransitioning
-                  ? "fadeOut 0.4s ease-in"
-                  : "fadeIn 1s ease-out 0.15s both",
+                  ? "slideOutRight 0.6s ease-in"
+                  : "slideInLeft 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both",
+                textShadow: "0 2px 10px rgba(0,0,0,0.5)",
               }}
             >
               {currentSlide.subtitle}
@@ -508,12 +497,13 @@ export default function App() {
 
             {/* Description */}
             <p
-              className="text-white/80 text-base lg:text-lg leading-relaxed max-w-lg"
+              className="text-white/90 text-base lg:text-lg leading-relaxed max-w-lg"
               key={`desc-${activeSlide}`}
               style={{
                 animation: isSlideTransitioning
-                  ? "fadeOut 0.4s ease-in"
-                  : "fadeIn 1s ease-out 0.3s both",
+                  ? "slideOutRight 0.6s ease-in"
+                  : "slideInLeft 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both",
+                textShadow: "0 2px 10px rgba(0,0,0,0.5)",
               }}
             >
               {currentSlide.description}
@@ -526,8 +516,8 @@ export default function App() {
                 className="group relative px-8 py-4 bg-red-600 hover:bg-red-700 rounded-xl overflow-hidden transition-all duration-500 ease-out hover:shadow-xl hover:shadow-red-500/50 hover:scale-[1.02]"
                 style={{
                   animation: isSlideTransitioning
-                    ? "fadeOut 0.4s ease-in"
-                    : "fadeIn 1s ease-out 0.5s both",
+                    ? "slideOutRight 0.6s ease-in"
+                    : "slideInLeft 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both",
                 }}
               >
                 <span className="relative z-10 font-semibold tracking-wide text-white">
@@ -746,15 +736,7 @@ export default function App() {
                             }}
                           />
 
-                          {/* Gradient Overlay */}
-                          <div
-                            className={`absolute inset-0 transition-all duration-1000 ${
-                              isActive
-                                ? "bg-gradient-to-t from-black/50 via-transparent to-transparent"
-                                : "bg-black/40"
-                            }`}
-                          />
-                          {/* Gradient Overlay */}
+                          {/* Gradient Overlay - KEEP ONLY ONE */}
                           <div
                             className={`absolute inset-0 transition-all duration-1000 ${
                               isActive
