@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-// NOTE: Since this is a single file component for demonstration,
-// the useNavigate import is kept but external routing will not work in this environment.
 
-// Mock navigation function for the environment
 const useNavigate = () => (path) => console.log(`Navigating to: ${path}`);
 
 const slides = [
@@ -73,54 +70,169 @@ export default function App() {
   const [currentX, setCurrentX] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isSlideTransitioning, setIsSlideTransitioning] = useState(false);
-
-  // State to manage the 1-second pause on the first thumbnail
   const [isInitialThumbnailPause, setIsInitialThumbnailPause] = useState(false);
-
   const progressInterval = useRef(null);
 
-  // Helper function to manage auto-play and prevent stale closures
+  const [isReveal, setIsReveal] = useState(false);
+  const [isDarkening, setIsDarkening] = useState(false);
+  const revealTimer = useRef(null);
+
+  const isHoveringActiveCard = useRef(false);
+  const wheelAccumX = useRef(0);
+  const wheelAccumY = useRef(0);
+  const isWheelLocked = useRef(false);
+  const prevBodyOverflow = useRef("");
+  const wheelLockTimeout = useRef(null); // NEW: Track the wheel lock timeout
+
+  const lockPageScroll = () => {
+    if (typeof document === "undefined") return;
+    if (!prevBodyOverflow.current) {
+      prevBodyOverflow.current = document.body.style.overflow || "";
+    }
+    document.body.style.overflow = "hidden";
+  };
+
+  const unlockPageScroll = () => {
+    if (typeof document === "undefined") return;
+    document.body.style.overflow = prevBodyOverflow.current || "";
+    prevBodyOverflow.current = "";
+  };
+
+  // UPDATED: central unlock with wheel lock timeout clearance
+  const releaseHoverLock = () => {
+    isHoveringActiveCard.current = false;
+    wheelAccumX.current = 0;
+    wheelAccumY.current = 0;
+    isWheelLocked.current = false;
+
+    // NEW: Clear the wheel lock timeout
+    if (wheelLockTimeout.current) {
+      clearTimeout(wheelLockTimeout.current);
+      wheelLockTimeout.current = null;
+    }
+
+    unlockPageScroll();
+  };
+
+  useEffect(() => {
+    return () => {
+      unlockPageScroll();
+      // NEW: Clear timeout on unmount
+      if (wheelLockTimeout.current) {
+        clearTimeout(wheelLockTimeout.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isSlideTransitioning || isReveal || isDarkening) {
+      if (isHoveringActiveCard.current) releaseHoverLock();
+    }
+  }, [isSlideTransitioning, isReveal, isDarkening]);
+
+  const shouldIgnoreWheel = () =>
+    !isHoveringActiveCard.current ||
+    isSlideTransitioning ||
+    isDragging ||
+    isReveal ||
+    isDarkening ||
+    isWheelLocked.current;
+
+  const getWheelIntent = () => {
+    const ax = Math.abs(wheelAccumX.current);
+    const ay = Math.abs(wheelAccumY.current);
+    const threshold = 50;
+    if (ax > ay && ax > threshold) return "horizontal";
+    if (ay >= ax && ay > threshold) return "vertical";
+    return null;
+  };
+
+  const handleThumbnailNavigation = (direction) => {
+    const isLast =
+      activeThumbnail === slides[activeSlide].thumbnails.length - 1;
+    if (direction === "next") {
+      if (activeThumbnail < slides[activeSlide].thumbnails.length - 1) {
+        setActiveThumbnail((p) => p + 1);
+      } else {
+        handleNext();
+      }
+    } else if (direction === "prev") {
+      if (activeThumbnail > 0) setActiveThumbnail((p) => p - 1);
+      else handlePrevious();
+    }
+    setProgress(0);
+  };
+
+  const handleActiveCardWheel = (e) => {
+    if (shouldIgnoreWheel()) return;
+
+    wheelAccumX.current += e.deltaX;
+    wheelAccumY.current += e.deltaY;
+
+    const intent = getWheelIntent();
+    if (!intent) return;
+
+    if (intent === "horizontal") {
+      if (wheelAccumX.current > 0) {
+        handleThumbnailNavigation("next");
+      } else {
+        handleThumbnailNavigation("prev");
+      }
+    } else if (intent === "vertical") {
+      if (wheelAccumY.current > 0) {
+        handleThumbnailNavigation("next");
+      } else {
+        handleThumbnailNavigation("prev");
+      }
+    }
+
+    isWheelLocked.current = true;
+    wheelAccumX.current = 0;
+    wheelAccumY.current = 0;
+
+    // UPDATED: Clear any existing timeout and create new one
+    if (wheelLockTimeout.current) {
+      clearTimeout(wheelLockTimeout.current);
+    }
+
+    wheelLockTimeout.current = setTimeout(() => {
+      isWheelLocked.current = false;
+      wheelLockTimeout.current = null;
+    }, 100);
+  };
+
   const handleNext = () => {
     const currentSlide = slides[activeSlide];
     const isLastThumbnail =
       activeThumbnail === currentSlide.thumbnails.length - 1;
 
-    // Check if we need a major slide transition
     if (isLastThumbnail) {
-      // --- START MAJOR SLIDE TRANSITION (Forward) ---
       setIsSlideTransitioning(true);
-      setIsInitialThumbnailPause(true); // Stop auto-play immediately
+      setIsInitialThumbnailPause(true);
 
-      // Wait for visual transition (1000ms)
       setTimeout(() => {
         const nextSlide = (activeSlide + 1) % slides.length;
 
-        // CORRECTED: Direct state updates after the delay
         setActiveSlide(nextSlide);
         setActiveThumbnail(0);
         setIsSlideTransitioning(false);
 
-        // Start the 1000ms pause on the new content (T0)
         setTimeout(() => {
-          setIsInitialThumbnailPause(false); // Resume auto-play
-          setProgress(0); // Reset progress to start the new loop
+          setIsInitialThumbnailPause(false);
+          setProgress(0);
         }, 1000);
-      }, 1000); // Wait for visual transition (1s)
+      }, 1000);
     } else {
-      // --- NORMAL THUMBNAIL PROGRESSION ---
       setActiveThumbnail(activeThumbnail + 1);
       setProgress(0);
     }
   };
 
-  // Auto-play with progress
   useEffect(() => {
-    // Clear interval on drag or pause state change
     if (progressInterval.current) {
       clearInterval(progressInterval.current);
     }
 
-    // Only start auto-play if not dragging AND not in the initial pause state
     if (!isDragging && !isInitialThumbnailPause) {
       progressInterval.current = setInterval(() => {
         setProgress((prev) => {
@@ -128,7 +240,6 @@ export default function App() {
             handleNext();
             return 0;
           }
-          // The auto-play speed remains the same
           return prev + 0.5;
         });
       }, 20);
@@ -139,7 +250,6 @@ export default function App() {
         clearInterval(progressInterval.current);
       }
     };
-    // Added isInitialThumbnailPause to dependencies to control the auto-play loop
   }, [activeThumbnail, activeSlide, isDragging, isInitialThumbnailPause]);
 
   const handlePrevious = () => {
@@ -147,8 +257,6 @@ export default function App() {
       setActiveThumbnail(activeThumbnail - 1);
       setProgress(0);
     } else if (activeSlide > 0) {
-      // For previous transition, we do not require the initial 1s pause
-      // as it lands on the last thumbnail of the previous slide, not the 'first image'.
       setIsSlideTransitioning(true);
 
       setTimeout(() => {
@@ -175,7 +283,6 @@ export default function App() {
     }
 
     setIsDragging(true);
-    // Pause auto-play immediately when starting a drag
     setIsInitialThumbnailPause(true);
     setStartX(e.type === "mousedown" ? e.clientX : e.touches[0].clientX);
     setCurrentX(e.type === "mousedown" ? e.clientX : e.touches[0].clientX);
@@ -198,14 +305,12 @@ export default function App() {
       if (diff > 0) {
         handlePrevious();
       } else {
-        // Use functional update for activeSlide in handleNext to avoid stale state in drag logic
         const isLastThumbnail =
           activeThumbnail === slides[activeSlide].thumbnails.length - 1;
         if (!isLastThumbnail) {
           setActiveThumbnail((prev) => prev + 1);
           setProgress(0);
         } else {
-          // If advancing to the next main slide via drag, use the full transition logic
           handleNext();
         }
       }
@@ -214,9 +319,30 @@ export default function App() {
     setIsDragging(false);
     setStartX(0);
     setCurrentX(0);
-    // Resume auto-play after drag is finished
     setIsInitialThumbnailPause(false);
   };
+
+  useEffect(() => {
+    clearTimeout(revealTimer.current);
+    if (!isSlideTransitioning && activeThumbnail === 0) {
+      setIsReveal(true);
+      setIsDarkening(false);
+      setIsInitialThumbnailPause(true);
+
+      revealTimer.current = setTimeout(() => {
+        setIsReveal(false);
+        setIsDarkening(true);
+        revealTimer.current = setTimeout(() => {
+          setIsDarkening(false);
+          setIsInitialThumbnailPause(false);
+        }, 700);
+      }, 3000);
+    } else {
+      setIsReveal(false);
+      setIsDarkening(false);
+    }
+    return () => clearTimeout(revealTimer.current);
+  }, [activeSlide, activeThumbnail, isSlideTransitioning]);
 
   const currentSlide = slides[activeSlide];
   const dragOffset = isDragging ? (currentX - startX) / 10 : 0;
@@ -227,34 +353,56 @@ export default function App() {
       style={{ minHeight: "100vh", fontFamily: "Inter, sans-serif" }}
     >
       {/* Portfolio Slider */}
-      <div className="relative w-full h-screen overflow-hidden bg-white">
+      <div
+        className="relative w-full h-screen overflow-hidden bg-white"
+        style={{ overscrollBehavior: "none" }} // prevent scroll chaining while hovered
+      >
         {/* Animated Background */}
         <div className="absolute inset-0">
           <div
             key={`bg-${activeSlide}-${activeThumbnail}`}
             className="absolute inset-0 bg-cover bg-center"
-            // Use a fallback placeholder image in case the mock paths fail
             style={{
-              backgroundImage: `url(${currentSlide.thumbnails[activeThumbnail]}), url(https://placehold.co/1920x1080/000000/cccccc?text=Architecture)`,
+              // backgroundImage: `url(${currentSlide.thumbnails[activeThumbnail]}), url(https://placehold.co/1920x1080/000000/cccccc?text=Architecture)`,
+              backgroundImage: `url(${currentSlide.thumbnails[activeThumbnail]})`,
               transform: isSlideTransitioning ? "scale(1.15)" : "scale(1.05)",
-              // --- EDITED: Added blur(4px) filter for background separation ---
-              filter: isSlideTransitioning
+              // Clean -> Darkening -> Final
+              filter: isReveal
+                ? "brightness(1) blur(0px)"
+                : isSlideTransitioning
                 ? "brightness(0.7) blur(4px)"
+                : isDarkening
+                ? "brightness(0.85) blur(4px)" // ramps from clean to dim/blur
                 : "brightness(1) blur(4px)",
-              transition: "all 1.5s cubic-bezier(0.4, 0.0, 0.2, 1)",
+              // faster filter ramp during darkening; keep smooth transform
+              transition:
+                "filter 700ms cubic-bezier(0.4, 0.0, 0.2, 1), transform 1.5s cubic-bezier(0.4, 0.0, 0.2, 1)",
             }}
           />
           <div
             className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent"
             style={{
-              opacity: isSlideTransitioning ? 0.3 : 1,
-              transition: "opacity 1s ease-out",
+              // overlays fade in during darkening
+              opacity: isReveal
+                ? 0
+                : isDarkening
+                ? 0.6
+                : isSlideTransitioning
+                ? 0.3
+                : 1,
+              transition: "opacity 700ms cubic-bezier(0.4, 0.0, 0.2, 1)",
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30 transition-opacity duration-1000" />
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30 transition-opacity"
+            style={{
+              opacity: isReveal ? 0 : isDarkening ? 1 : 1,
+              transition: "opacity 700ms cubic-bezier(0.4, 0.0, 0.2, 1)",
+            }}
+          />
         </div>
 
-        {/* Transition Overlay */}
+        {/* Transition Overlay (unchanged) */}
         {isSlideTransitioning && (
           <div
             className="absolute inset-0 z-20 pointer-events-none"
@@ -266,15 +414,19 @@ export default function App() {
           />
         )}
 
-        {/* Content Container - NOW THE PRIMARY SWIPE TARGET FOR MOBILE */}
+        {/* Content Container */}
         <div
           className="relative z-10 flex items-center h-full max-w-[1800px] mx-auto px-6 sm:px-12 lg:px-20"
-          tabIndex={0} // Make focusable for keyboard navigation
+          role="group"
           style={{
-            opacity: isSlideTransitioning ? 0 : 1,
+            // keep content hidden during reveal and darkening
+            opacity: isSlideTransitioning || isReveal || isDarkening ? 0 : 1,
             transform: isSlideTransitioning ? "scale(0.95)" : "scale(1)",
-            transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
-            touchAction: "pan-y", // Allow horizontal pan but control vertical scroll
+            transition:
+              "opacity 400ms ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
+            touchAction: "pan-y",
+            pointerEvents:
+              isSlideTransitioning || isReveal || isDarkening ? "none" : "auto",
           }}
           // --- DRAG HANDLERS MOVED HERE FOR MOBILE RESPONSIVENESS ---
           onMouseDown={handleDragStart}
@@ -479,8 +631,9 @@ export default function App() {
                 // Drag handlers removed from here and moved to parent Content Container
               >
                 {currentSlide.thumbnails.map((thumb, index) => {
-                  const offset = index - activeThumbnail;
                   const isActive = index === activeThumbnail;
+                  // FIX: define offset and absOffset used below
+                  const offset = index - activeThumbnail;
                   const absOffset = Math.abs(offset);
 
                   // Calculate subtle Z-rotation based on drag
@@ -511,6 +664,23 @@ export default function App() {
                       aria-pressed={isActive}
                       onClick={() => !isActive && handleThumbnailClick(index)}
                       onKeyDown={handleKeyDown}
+                      // Wheel + hover tracking only on active card
+                      onMouseEnter={
+                        isActive
+                          ? () => {
+                              isHoveringActiveCard.current = true;
+                              lockPageScroll();
+                            }
+                          : undefined
+                      }
+                      onMouseLeave={
+                        isActive
+                          ? () => {
+                              releaseHoverLock(); // immediate unlock on leave
+                            }
+                          : undefined
+                      }
+                      onWheel={isActive ? handleActiveCardWheel : undefined}
                       className="absolute cursor-pointer w-[400px] h-[550px] transform-gpu"
                       style={{
                         transform: isSlideTransitioning
@@ -534,6 +704,7 @@ export default function App() {
                           : "all 1s cubic-bezier(0.16, 1, 0.3, 1)",
                         transformStyle: "preserve-3d",
                         backfaceVisibility: "hidden",
+                        overscrollBehavior: "contain", // reduce scroll chaining
                       }}
                     >
                       {/* Border */}
@@ -634,20 +805,17 @@ export default function App() {
               onClick={() => {
                 if (index !== activeSlide) {
                   setIsSlideTransitioning(true);
-                  // Stop auto-play immediately
                   setIsInitialThumbnailPause(true);
 
                   setTimeout(() => {
-                    // After 1000ms (Visual transition)
                     setActiveSlide(index);
                     setActiveThumbnail(0);
 
-                    setIsSlideTransitioning(false); // End visual transition
+                    setIsSlideTransitioning(false);
 
-                    // Start the 1000ms pause on the new content (T0)
                     setTimeout(() => {
-                      setIsInitialThumbnailPause(false); // Resume auto-play
-                      setProgress(0); // Reset progress
+                      setIsInitialThumbnailPause(false);
+                      setProgress(0);
                     }, 1000);
                   }, 1000);
                 }

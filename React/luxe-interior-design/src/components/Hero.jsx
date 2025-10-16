@@ -8,16 +8,11 @@ gsap.registerPlugin(ScrollTrigger);
 const Hero = () => {
   const containerRef = useRef(null);
   const videoRef = useRef(null);
-  const videoTextRef = useRef(null);
   const scrollTextRightRef = useRef(null);
   const text1Ref = useRef(null);
   const text2Ref = useRef(null);
   const text3Ref = useRef(null);
   const musicRef = useRef(null);
-  const scrollTriggerRef = useRef(null);
-  const videoTweenRef = useRef(null);
-  const tickerRef = useRef(null);
-  const targetTimeRef = useRef(0);
 
   // Device capability detection
   const [deviceCapability, setDeviceCapability] = useState({
@@ -41,10 +36,8 @@ const Hero = () => {
       const isLowEnd =
         cores <= 4 ||
         memory <= 4 ||
-        (connection &&
-          connection.effectiveType &&
-          (connection.effectiveType === "slow-2g" ||
-            connection.effectiveType === "2g"));
+        connection?.effectiveType === "slow-2g" ||
+        connection?.effectiveType === "2g";
 
       // Determine video quality
       let videoQuality = "1080p";
@@ -67,7 +60,6 @@ const Hero = () => {
   useEffect(() => {
     const container = containerRef.current;
     const video = videoRef.current;
-    const videoText = videoTextRef.current;
     const scrollTextRight = scrollTextRightRef.current;
     const text1 = text1Ref.current;
     const text2 = text2Ref.current;
@@ -76,26 +68,7 @@ const Hero = () => {
 
     if (!container || !video) return;
 
-    const once = (el, event, fn) => {
-      const onceFn = (e) => {
-        el.removeEventListener(event, onceFn);
-        fn(e);
-      };
-      el.addEventListener(event, onceFn, { passive: true });
-      return onceFn;
-    };
-
-    const triggersToKill = [];
-
-    if (scrollTriggerRef.current) {
-      scrollTriggerRef.current.kill();
-      scrollTriggerRef.current = null;
-    }
-    if (videoTweenRef.current) {
-      videoTweenRef.current.kill();
-      videoTweenRef.current = null;
-    }
-
+    // Set video source based on device capability
     const setVideoSource = () => {
       let videoSrc;
       switch (deviceCapability.videoQuality) {
@@ -106,54 +79,96 @@ const Hero = () => {
           videoSrc = "/videos/compressed-720p.mp4";
           break;
         default:
-          videoSrc = "/videos/compressed3.mp4";
+          videoSrc = "/videos/compressed1.mp4";
       }
       video.src = videoSrc;
     };
 
     setVideoSource();
-    video.load();
 
-    const scrubAmount = deviceCapability.isLowEnd ? 1 : 0.35;
+    // Helper function for one-time event listeners
+    function once(el, event, fn) {
+      const onceFn = function (e) {
+        el.removeEventListener(event, onceFn);
+        fn.apply(this, arguments);
+      };
+      el.addEventListener(event, onceFn);
+      return onceFn;
+    }
 
-    const initVideoScroll = () => {
-      if (!video.duration) return;
-      video.pause();
-      video.currentTime = 0.0001;
-      gsap.set(video, { force3D: true });
+    // Touch start handler for mobile - fixed to avoid play/pause conflict
+    once(document.documentElement, "touchstart", function () {
+      video
+        .play()
+        .then(() => {
+          video.pause();
+        })
+        .catch(() => {
+          // Silently handle if play fails
+        });
+    });
 
-      videoTweenRef.current = gsap.to(video, {
-        currentTime: () => Math.max(video.duration - 0.05, 0),
-        ease: "none",
-        paused: true,
-      });
+    // --- VIDEO SCRUBBING CONTROL: PERFORMANCE BALANCED ---
+    // Adjust scrub value based on device capability
+    const scrubValue = deviceCapability.isLowEnd ? 2 : 3;
 
-      scrollTriggerRef.current = ScrollTrigger.create({
+    let videoTl = gsap.timeline({
+      defaults: { duration: 1, ease: "none" },
+      scrollTrigger: {
         trigger: container,
         start: "top top",
         end: "bottom bottom",
-        scrub: scrubAmount,
+        scrub: scrubValue,
         anticipatePin: 1,
-        animation: videoTweenRef.current,
-      });
+      },
+    });
 
-      triggersToKill.push(scrollTriggerRef.current);
-      ScrollTrigger.refresh();
+    // Handle video metadata loading
+    const handleVideoLoad = () => {
+      videoTl.fromTo(
+        video,
+        { currentTime: 0 },
+        {
+          currentTime: video.duration || 1,
+          ease: "none",
+        }
+      );
     };
 
-    const handleLoadedMetadata = () => {
+    once(video, "loadedmetadata", handleVideoLoad);
+
+    // Video Blob Loading (for better performance)
+    let src = video.currentSrc || video.src;
+    if (window["fetch"]) {
+      fetch(src)
+        .then((response) => response.blob())
+        .then((response) => {
+          const blobURL = URL.createObjectURL(response);
+          const t = video.currentTime;
+          video.setAttribute("src", blobURL);
+          video.currentTime = t + 0.01;
+        })
+        .catch(() => {
+          // Fallback if blob loading fails
+          console.log("Using direct video source");
+        });
+    }
+
+    // Force video to be ready for smooth seeking - fixed promise handling
+    video.addEventListener("loadeddata", () => {
+      gsap.set(video, { force3D: true });
+      // Prefetch video buffer with proper promise handling
       video
         .play()
-        .then(() => video.pause())
-        .catch(() => {});
-      initVideoScroll();
-    };
-
-    if (video.readyState >= 1) {
-      handleLoadedMetadata();
-    } else {
-      video.addEventListener("loadedmetadata", handleLoadedMetadata);
-    }
+        .then(() => {
+          video.pause();
+          video.currentTime = 0;
+        })
+        .catch(() => {
+          // Silently handle if play fails
+          video.currentTime = 0;
+        });
+    });
 
     // --- MUSIC CONTROL ---
     if (music) {
@@ -167,7 +182,7 @@ const Hero = () => {
       once(document.documentElement, "click", primeMusic);
 
       // Music fade in/out on section entry
-      const musicTrigger = ScrollTrigger.create({
+      ScrollTrigger.create({
         trigger: container,
         start: "top top",
         end: "bottom bottom",
@@ -186,12 +201,10 @@ const Hero = () => {
           gsap.to(music, { volume: 0, duration: 1 });
         },
       });
-
-      triggersToKill.push(musicTrigger);
     }
 
-    // --- TEXT ANIMATIONS TIMELINE ---
-    const textTl = gsap.timeline({
+    // --- ELEGANT TEXT ANIMATIONS TIMELINE ---
+    let textTl = gsap.timeline({
       scrollTrigger: {
         trigger: container,
         start: "top top",
@@ -200,84 +213,147 @@ const Hero = () => {
       },
     });
 
-    triggersToKill.push(textTl.scrollTrigger);
-
     const duration = 0.03;
 
-    textTl.to(videoText, { opacity: 0, scale: 0.8, duration: duration * 2 }, 0);
+    // Right scroll text with smooth slide
+    if (scrollTextRight) {
+      textTl
+        .fromTo(
+          scrollTextRight,
+          {
+            x: 80,
+            opacity: 0,
+            scale: 0.95,
+          },
+          {
+            x: 0,
+            opacity: 1,
+            scale: 1,
+            duration: duration * 1.3,
+          },
+          0.15
+        )
+        .to(
+          scrollTextRight,
+          {
+            x: -80,
+            opacity: 0,
+            scale: 0.95,
+            duration: duration * 1.3,
+          },
+          0.28
+        );
+    }
 
-    // Scroll Text Right
-    textTl
-      .fromTo(
-        scrollTextRight,
-        { x: 100, opacity: 0, scale: 0.9 },
-        { x: 0, opacity: 1, scale: 1, duration: duration },
-        0.15
-      )
-      .to(scrollTextRight, { x: -100, opacity: 0, duration: duration }, 0.28);
+    // Text 1 with elegant entrance
+    if (text1) {
+      textTl
+        .fromTo(
+          text1,
+          {
+            x: -80,
+            opacity: 0,
+            scale: 0.96,
+          },
+          {
+            x: 0,
+            opacity: 1,
+            scale: 1,
+            duration: duration * 1.2,
+          },
+          0.35
+        )
+        .to(
+          text1,
+          {
+            x: 80,
+            opacity: 0,
+            scale: 0.96,
+            duration: duration * 1.2,
+          },
+          0.55
+        );
+    }
 
-    // Text 1
-    textTl
-      .fromTo(
-        text1,
-        { x: -100, opacity: 0 },
-        { x: 0, opacity: 1, duration: duration },
-        0.35
-      )
-      .to(text1, { x: 100, opacity: 0, duration: duration }, 0.55);
+    // Text 2 with refined movement
+    if (text2) {
+      textTl
+        .fromTo(
+          text2,
+          {
+            x: -80,
+            opacity: 0,
+            scale: 0.96,
+          },
+          {
+            x: 0,
+            opacity: 1,
+            scale: 1,
+            duration: duration * 1.2,
+          },
+          0.6
+        )
+        .to(
+          text2,
+          {
+            x: 80,
+            opacity: 0,
+            scale: 0.96,
+            duration: duration * 1.2,
+          },
+          0.8
+        );
+    }
 
-    // Text 2
-    textTl
-      .fromTo(
-        text2,
-        { x: -100, opacity: 0 },
-        { x: 0, opacity: 1, duration: duration },
-        0.6
-      )
-      .to(text2, { x: 100, opacity: 0, duration: duration }, 0.8);
-
-    // Text 3
-    textTl.fromTo(
-      text3,
-      { x: -100, opacity: 0 },
-      { x: 0, opacity: 1, duration: duration },
-      0.85
-    );
+    // Text 3 with smooth entrance and stays visible
+    if (text3) {
+      textTl.fromTo(
+        text3,
+        {
+          x: -80,
+          opacity: 0,
+          scale: 0.96,
+        },
+        {
+          x: 0,
+          opacity: 1,
+          scale: 1,
+          duration: duration * 1.3,
+        },
+        0.85
+      );
+    }
 
     // Cleanup function
     return () => {
-      video.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      triggersToKill.forEach((trigger) => trigger && trigger.kill());
-
-      if (videoTweenRef.current) {
-        videoTweenRef.current.kill();
-        videoTweenRef.current = null;
+      for (const trigger of ScrollTrigger.getAll()) {
+        trigger.kill();
       }
     };
   }, [deviceCapability]);
 
   // --- ADAPTIVE STYLING BASED ON DEVICE ---
   const textStyleModern =
-    "text-2xl md:text-3xl lg:text-4xl mb-3 md:mb-4 font-bold tracking-tight text-white";
+    "text-2xl md:text-3xl lg:text-4xl mb-3 md:mb-4 font-light tracking-wide text-stone-100";
   const bodyStyleModern =
-    "text-sm md:text-base leading-relaxed font-normal text-white/90";
+    "text-sm md:text-base leading-relaxed font-light text-stone-200/95";
 
   // Conditional backdrop blur based on device
   const getCardStyle = () => {
     if (deviceCapability.isLowEnd) {
       // Low-end: No backdrop blur, solid background
-      return "opacity-0 bg-black/70 border border-white/30 px-5 md:px-7 pt-[68px] md:pt-[90px] pb-[24px] md:pb-[28px] rounded-2xl relative shadow-lg transition-all duration-300 hover:bg-black/80 hover:border-white/40";
+      return "opacity-0 bg-stone-900/75 border border-amber-200/30 px-5 md:px-7 pt-[68px] md:pt-[90px] pb-[24px] md:pb-[28px] rounded-2xl relative shadow-lg transition-all duration-300 hover:bg-stone-800/85 hover:border-amber-200/40";
     } else {
       // High-end: Backdrop blur with gradients
-      return "opacity-0 backdrop-blur-md bg-gradient-to-br from-violet-600/25 to-fuchsia-600/25 border border-white/20 px-5 md:px-7 pt-[68px] md:pt-[90px] pb-[24px] md:pb-[28px] rounded-2xl relative shadow-xl transition-all duration-300 hover:from-violet-600/30 hover:to-fuchsia-600/30 hover:border-white/30";
+      return "opacity-0 backdrop-blur-md bg-gradient-to-br from-stone-800/30 to-amber-900/20 border border-amber-200/20 px-5 md:px-7 pt-[68px] md:pt-[90px] pb-[24px] md:pb-[28px] rounded-2xl relative shadow-xl transition-all duration-300 hover:from-stone-800/40 hover:to-amber-900/30 hover:border-amber-200/30";
     }
   };
 
   const getRightCardStyle = () => {
     if (deviceCapability.isLowEnd) {
-      return "backdrop-blur-none bg-black/75 border border-white/30";
+      return "backdrop-blur-none bg-stone-900/80 border border-amber-200/30";
     } else {
-      return "backdrop-blur-md bg-gradient-to-br from-violet-600/25 to-fuchsia-600/25 border border-white/25";
+      return "backdrop-blur-md bg-gradient-to-br from-stone-800/30 to-amber-900/20 border border-amber-200/25";
     }
   };
 
@@ -285,25 +361,29 @@ const Hero = () => {
   const rightCardStyle = getRightCardStyle();
 
   const numStyleModern =
-    "absolute top-4 md:top-5 left-5 md:left-7 text-[64px] md:text-[80px] font-black leading-none text-white/10 m-0";
+    "absolute top-4 md:top-5 left-5 md:left-7 text-[64px] md:text-[80px] font-light leading-none text-amber-200/15 m-0";
 
   return (
-    <div className="relative z-0">
+    <>
       {/* Background Music */}
       <audio ref={musicRef} preload="auto" loop>
         <source src="/music/calm.mp3" type="audio/mpeg" />
+        <track kind="captions" srcLang="en" label="English captions" />
       </audio>
 
       <div
         ref={containerRef}
-        className="relative h-[400vh] bg-black mb-10"
-        style={{ contain: "layout style paint" }}
+        className="relative h-[400vh] bg-black"
+        style={{
+          contain: "layout style paint",
+          zIndex: 0,
+          isolation: "isolate",
+        }}
       >
         <div
           className="sticky top-0 h-screen w-full overflow-hidden"
-          style={{ contain: "layout paint" }}
+          style={{ contain: "layout paint", zIndex: 1 }}
         >
-          {/* VIDEO - Adaptive quality */}
           <video
             ref={videoRef}
             className="absolute top-0 left-0 w-full h-full object-cover"
@@ -313,74 +393,67 @@ const Hero = () => {
             style={{
               transform: "translateZ(0)",
               filter: "brightness(0.9) contrast(1.1)",
+              zIndex: 0,
             }}
           >
-            {/* Fallback source - will be replaced by JS */}
             <source src="/videos/compressed1.mp4" type="video/mp4" />
+            <track kind="captions" srcLang="en" label="English captions" />
           </video>
 
-          {/* Simplified vignette */}
-          <div className="absolute inset-0 pointer-events-none bg-gradient-radial from-transparent via-transparent to-black/30" />
+          {/* Warm vignette overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none bg-gradient-radial from-transparent via-transparent to-amber-950/40"
+            style={{ zIndex: 1 }}
+          />
 
           <div
-            className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-white z-[2]"
-            style={{ contain: "layout style" }}
+            className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-white"
+            style={{ contain: "layout style", zIndex: 2 }}
           >
-            {/* INITIAL HERO TEXT */}
-            <div
-              ref={videoTextRef}
-              className="text-center p-5 hero-text-overlay"
-            >
-              <h1 className="text-[52px] md:text-[96px] lg:text-[140px] mb-4 md:mb-6 font-black tracking-tight leading-[0.9] px-4 relative text-white drop-shadow-2xl">
-                <span className="block opacity-0 animate-[fadeInUp_0.8s_ease-out_0.1s_forwards] bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 bg-clip-text text-transparent">
-                  ELEVATE
-                </span>
-                <span className="block opacity-0 animate-[fadeInUp_0.8s_ease-out_0.3s_forwards]">
-                  YOUR SPACE
-                </span>
-              </h1>
-              <p className="text-lg md:text-2xl lg:text-3xl font-medium tracking-wide px-4 opacity-0 animate-[fadeInUp_0.8s_ease-out_0.5s_forwards] relative text-white/90 max-w-3xl mx-auto drop-shadow-lg">
-                Where innovation meets{" "}
-                <span className="text-violet-400 font-bold">
-                  architectural excellence
-                </span>
-              </p>
-            </div>
-
-            {/* Right scroll text - Adaptive glassmorphism */}
+            {/* Right scroll text */}
             <div
               ref={scrollTextRightRef}
-              className={`absolute right-5 md:right-10 lg:right-20 top-1/2 transform -translate-y-1/2 max-w-[calc(100%-40px)] md:max-w-[400px] lg:max-w-[440px] opacity-0 z-[4] ${rightCardStyle} text-white px-6 md:px-8 py-6 md:py-8 rounded-2xl shadow-xl`}
+              className={`absolute right-5 md:right-10 lg:right-20 top-1/2 transform -translate-y-1/2 max-w-[calc(100%-40px)] md:max-w-[400px] lg:max-w-[440px] opacity-0 ${rightCardStyle} text-white px-6 md:px-8 py-6 md:py-8 rounded-2xl shadow-xl`}
+              style={{
+                perspective: "1000px",
+                transformStyle: "preserve-3d",
+                background: "rgba(24, 24, 27, 0.9)",
+                zIndex: 3,
+              }}
             >
-              <h2 className="text-[36px] md:text-[44px] lg:text-[50px] mb-4 md:mb-5 font-bold leading-[1.1] text-white tracking-tight drop-shadow-lg">
-                Modern Vision
+              <h2 className="text-[36px] md:text-[44px] lg:text-[50px] mb-4 md:mb-5 font-light leading-[1.1] text-stone-100 tracking-wide drop-shadow-lg">
+                Design Philosophy
               </h2>
-              <p className="text-sm md:text-base lg:text-lg leading-relaxed font-normal text-white/90">
-                Redefining architectural boundaries with bold designs that
-                inspire, spaces that breathe, and innovations that last.
+              <p className="text-sm md:text-base lg:text-lg leading-relaxed font-light text-stone-200">
+                Crafting harmonious spaces that blend elegance with
+                functionality, where every detail tells your story.
               </p>
             </div>
           </div>
 
-          {/* Left scroll text sections - Adaptive cards */}
+          {/* Left scroll text sections */}
           <div
-            className="absolute left-5 md:left-10 lg:left-20 opacity-90 z-[2] max-w-[calc(100%-40px)] md:max-w-[440px] lg:max-w-[500px]"
+            className="absolute left-5 md:left-10 lg:left-20 opacity-90 max-w-[calc(100%-40px)] md:max-w-[440px] lg:max-w-[500px]"
             style={{
               top: "calc(50% + 30px)",
               transform: "translateY(-50%)",
               contain: "layout style",
+              perspective: "1200px",
+              transformStyle: "preserve-3d",
+              zIndex: 2,
             }}
           >
             {/* Section 01 */}
             <div
               ref={text1Ref}
               className={`mb-[30px] md:mb-[20px] ${cardStyleModern}`}
+              style={{ background: "rgba(24, 24, 27, 0.9)" }}
             >
               <div className={numStyleModern}>01</div>
-              <h3 className={textStyleModern}>Innovative Design</h3>
+              <h3 className={textStyleModern}>Timeless Elegance</h3>
               <p className={bodyStyleModern}>
-                Pushing creative boundaries with cutting-edge concepts that
-                transform ordinary spaces into extraordinary experiences.
+                Curating sophisticated interiors that combine classic beauty
+                with contemporary comfort, creating spaces that age gracefully.
               </p>
             </div>
 
@@ -388,12 +461,13 @@ const Hero = () => {
             <div
               ref={text2Ref}
               className={`mb-[30px] md:mb-[20px] ${cardStyleModern}`}
+              style={{ background: "rgba(24, 24, 27, 0.9)" }}
             >
               <div className={numStyleModern}>02</div>
-              <h3 className={textStyleModern}>Smart Integration</h3>
+              <h3 className={textStyleModern}>Personalized Spaces</h3>
               <p className={bodyStyleModern}>
-                Seamlessly blending technology with aesthetics to create
-                intelligent environments that adapt to your lifestyle.
+                Tailoring every element to reflect your lifestyle and
+                personality, ensuring your home truly feels like yours.
               </p>
             </div>
 
@@ -401,20 +475,20 @@ const Hero = () => {
             <div
               ref={text3Ref}
               className={`mb-[30px] md:mb-[20px] ${cardStyleModern}`}
+              style={{ background: "rgba(24, 24, 27, 0.9)" }}
             >
               <div className={numStyleModern}>03</div>
-              <h3 className={textStyleModern}>Sustainable Future</h3>
+              <h3 className={textStyleModern}>Sustainable Luxury</h3>
               <p className={bodyStyleModern}>
-                Building tomorrow's legacy today with eco-conscious materials
-                and forward-thinking sustainable practices.
+                Embracing eco-conscious materials and artisan craftsmanship to
+                create beautiful, responsible living environments.
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <style>
-        {`
+      <style>{`
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -439,9 +513,8 @@ const Hero = () => {
         video {
           will-change: auto;
         }
-      `}
-      </style>
-    </div>
+      `}</style>
+    </>
   );
 };
 
