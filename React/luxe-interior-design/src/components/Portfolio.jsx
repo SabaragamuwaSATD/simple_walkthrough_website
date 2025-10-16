@@ -667,12 +667,6 @@ export default function App() {
                       handleThumbnailClick(index);
                     }
                   };
-                  // Keyboard accessibility handler
-                  const handleKeyDown = (e) => {
-                    if (!isActive && (e.key === "Enter" || e.key === " ")) {
-                      handleThumbnailClick(index);
-                    }
-                  };
 
                   return (
                     <div
@@ -860,8 +854,6 @@ export default function App() {
           ))}
         </div>
 
-        {/* CSS Animations */}
-        <style>{`
         {/* CSS Animations */}
         <style>{`
         @keyframes slideInLeft {
