@@ -91,10 +91,10 @@ const About = () => {
     });
 
     return () => {
-      handlers.forEach(({ container, onEnter, onLeave }) => {
+      for (const { container, onEnter, onLeave } of handlers) {
         container.removeEventListener("mouseenter", onEnter);
         container.removeEventListener("mouseleave", onLeave);
-      });
+      }
     };
   }, []);
 
@@ -251,18 +251,14 @@ const About = () => {
                               data-attempts="0"
                               onError={(e) => {
                                 const img = e.currentTarget;
-                                const base =
-                                  img.getAttribute("data-base") || "";
-                                const attempts = parseInt(
-                                  img.getAttribute("data-attempts") || "0",
+                                const base = img.dataset.base || "";
+                                const attempts = Number.parseInt(
+                                  img.dataset.attempts || "0",
                                   10
                                 );
                                 const exts = [".jpeg", ".jpg", ".webp", ".png"];
                                 if (attempts < exts.length) {
-                                  img.setAttribute(
-                                    "data-attempts",
-                                    String(attempts + 1)
-                                  );
+                                  img.dataset.attempts = String(attempts + 1);
                                   img.src = `${base}${exts[attempts]}`;
                                 } else {
                                   img.style.display = "none";
@@ -360,7 +356,7 @@ const About = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

@@ -1,8 +1,4 @@
-import React, { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import React, { useEffect, useRef, useState } from "react";
 
 const servicesData = [
   {
@@ -50,182 +46,123 @@ const servicesData = [
 ];
 
 const Services = () => {
+  const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef(null);
-  const titleRef = useRef(null);
-  const cardsRef = useRef([]);
 
   useEffect(() => {
-    const section = sectionRef.current;
-    const title = titleRef.current;
-    const cards = cardsRef.current.filter(Boolean);
-
-    if (!section || !cards.length) return;
-
-    // Title animation
-    gsap.fromTo(
-      title,
-      {
-        y: 50,
-        opacity: 0,
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        }
       },
       {
-        y: 0,
-        opacity: 1,
-        duration: 1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: section,
-          start: "top 85%",
-          toggleActions: "play none none none",
-        },
+        threshold: 0.1,
+        rootMargin: "0px 0px -100px 0px",
       }
     );
 
-    // Cards staggered animation
-    gsap.fromTo(
-      cards,
-      {
-        y: 60,
-        opacity: 0,
-        scale: 0.8,
-      },
-      {
-        y: 0,
-        opacity: 1,
-        scale: 1,
-        duration: 0.8,
-        ease: "power3.out",
-        stagger: 0.15,
-        scrollTrigger: {
-          trigger: section,
-          start: "top 75%",
-          toggleActions: "play none none none",
-        },
-      }
-    );
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
 
-    // Add hover animations to each card
-    cards.forEach((card, index) => {
-      if (!card) return;
-
-      const icon = card.querySelector(".service-icon");
-      const title = card.querySelector(".service-title");
-      const description = card.querySelector(".service-description");
-
-      // Mouse enter animation
-      const handleMouseEnter = () => {
-        gsap.to(card, {
-          y: -10,
-          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
-          duration: 0.3,
-          ease: "power2.out",
-        });
-
-        gsap.to(icon, {
-          scale: 1.1,
-          rotationY: 10,
-          duration: 0.3,
-          ease: "power2.out",
-        });
-
-        gsap.to([title, description], {
-          x: 5,
-          duration: 0.3,
-          ease: "power2.out",
-        });
-      };
-
-      // Mouse leave animation
-      const handleMouseLeave = () => {
-        gsap.to(card, {
-          y: 0,
-          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
-          duration: 0.3,
-          ease: "power2.out",
-        });
-
-        gsap.to(icon, {
-          scale: 1,
-          rotationY: 0,
-          duration: 0.3,
-          ease: "power2.out",
-        });
-
-        gsap.to([title, description], {
-          x: 0,
-          duration: 0.3,
-          ease: "power2.out",
-        });
-      };
-
-      card.addEventListener("mouseenter", handleMouseEnter);
-      card.addEventListener("mouseleave", handleMouseLeave);
-
-      // Store cleanup functions
-      card._cleanup = () => {
-        card.removeEventListener("mouseenter", handleMouseEnter);
-        card.removeEventListener("mouseleave", handleMouseLeave);
-      };
-    });
-
-    // Cleanup
     return () => {
-      cards.forEach((card) => {
-        if (card && card._cleanup) {
-          card._cleanup();
-        }
-      });
-
-      ScrollTrigger.getAll().forEach((trigger) => {
-        if (trigger.vars?.trigger === section) {
-          trigger.kill();
-        }
-      });
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
     };
   }, []);
 
   return (
-    <section ref={sectionRef} id="services" className="py-25 mb-20">
-      <h2
-        ref={titleRef}
-        className="text-[42px] text-center mb-16 text-[#2c3e50] font-light tracking-[2px]"
+    <>
+      <section
+        ref={sectionRef}
+        id="services"
+        className="relative py-24 mb-20 bg-white scroll-mt-32"
+        style={{
+          isolation: "isolate",
+          zIndex: 1,
+          position: "relative",
+          backgroundColor: "#ffffff",
+          minHeight: "100vh",
+        }}
       >
-        Our Services
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-[1200px] mx-auto px-12">
-        {servicesData.map((service, index) => (
-          <div
-            key={index}
-            ref={(el) => (cardsRef.current[index] = el)}
-            className="p-12 bg-[#f8f9fa] text-center transition-all duration-300 cursor-pointer"
-            style={{
-              borderRadius: "0px",
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
-            }}
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <h2
+            className={`text-[42px] text-center mb-16 text-[#2c3e50] font-light tracking-[2px] transition-all duration-1000 ${
+              isVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-12"
+            }`}
+            style={{ position: "relative", zIndex: 2 }}
           >
-            {service.image && (
-              <div className="mb-6 -mx-12 -mt-12">
-                <img
-                  src={service.image}
-                  alt={service.title}
-                  className="w-full h-48 object-cover"
-                />
+            Our Services
+          </h2>
+          <div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-[1200px] mx-auto px-12"
+            style={{ position: "relative", zIndex: 2 }}
+          >
+            {servicesData.map((service, index) => (
+              <div
+                key={service.title}
+                className={`service-card relative p-12 bg-[#f8f9fa] text-center transition-all duration-700 cursor-pointer ${
+                  isVisible
+                    ? "opacity-100 translate-y-0 scale-100"
+                    : "opacity-0 translate-y-16 scale-90"
+                }`}
+                style={{
+                  borderRadius: "0px",
+                  boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
+                  position: "relative",
+                  zIndex: 3,
+                  backgroundColor: "#f8f9fa",
+                  transitionDelay: `${index * 150}ms`,
+                }}
+              >
+                {service.image && (
+                  <div className="mb-6 -mx-12 -mt-12 overflow-hidden">
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="w-full h-48 object-cover transition-transform duration-500"
+                      style={{ display: "block" }}
+                    />
+                  </div>
+                )}
+                <h3 className="service-title text-2xl mb-4 text-[#2c3e50] transition-transform duration-300">
+                  {service.title}
+                </h3>
+                <p className="service-description text-[#1b1a1a] leading-[1.6] transition-transform duration-300">
+                  {service.description}
+                </p>
               </div>
-            )}
-
-            {/* <div className="service-icon text-[48px] mb-5 text-[#c9a961]">
-              {service.icon}
-            </div> */}
-            <h3 className="service-title text-2xl mb-4 text-[#2c3e50]">
-              {service.title}
-            </h3>
-            <p className="service-description text-[#1b1a1a] leading-[1.6]">
-              {service.description}
-            </p>
+            ))}
           </div>
-        ))}
-      </div>
-    </section>
+        </div>
+      </section>
+
+      <style>{`
+        .service-card {
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .service-card:hover {
+          transform: translateY(-10px);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-card:hover .service-title,
+        .service-card:hover .service-description {
+          transform: translateX(5px);
+        }
+
+        .service-card:hover img {
+          transform: scale(1.05);
+        }
+      `}</style>
+    </>
   );
 };
 
