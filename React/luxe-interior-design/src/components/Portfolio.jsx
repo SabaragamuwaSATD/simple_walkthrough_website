@@ -493,6 +493,18 @@ export default function App() {
             >
               {currentSlide.subtitle}
             </div>
+            {/* Subtitle */}
+            <div
+              className="text-white text-base font-medium tracking-wide"
+              key={`subtitle-${activeSlide}`}
+              style={{
+                animation: isSlideTransitioning
+                  ? "fadeOut 0.4s ease-in"
+                  : "fadeIn 1s ease-out 0.15s both",
+              }}
+            >
+              {currentSlide.subtitle}
+            </div>
 
             {/* Description */}
             <p
@@ -655,6 +667,12 @@ export default function App() {
                       handleThumbnailClick(index);
                     }
                   };
+                  // Keyboard accessibility handler
+                  const handleKeyDown = (e) => {
+                    if (!isActive && (e.key === "Enter" || e.key === " ")) {
+                      handleThumbnailClick(index);
+                    }
+                  };
 
                   return (
                     <div
@@ -734,6 +752,14 @@ export default function App() {
                             }}
                           />
 
+                          {/* Gradient Overlay */}
+                          <div
+                            className={`absolute inset-0 transition-all duration-1000 ${
+                              isActive
+                                ? "bg-gradient-to-t from-black/50 via-transparent to-transparent"
+                                : "bg-black/40"
+                            }`}
+                          />
                           {/* Gradient Overlay */}
                           <div
                             className={`absolute inset-0 transition-all duration-1000 ${
@@ -834,6 +860,8 @@ export default function App() {
           ))}
         </div>
 
+        {/* CSS Animations */}
+        <style>{`
         {/* CSS Animations */}
         <style>{`
         @keyframes slideInLeft {
