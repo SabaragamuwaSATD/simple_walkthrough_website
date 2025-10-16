@@ -18,42 +18,42 @@ const About = () => {
   // Awards data with positions (percentage-based for responsiveness)
   const awards = [
     {
-      id: 2,
+      id: 1,
       title: "International Women Achievers Award",
       year: "2023",
       organization: "Taj Pedavura Colombo Crystal Haven",
-      description:
-        "Honoring exceptional women leaders who have made significant contributions to their industries and communities through innovation and excellence",
+      // description:
+      //   "Honoring exceptional women leaders who have made significant contributions to their industries and communities through innovation and excellence",
       image: "/images/women-achievers-award.jpg",
       position: { left: "85%", top: "78%" },
     },
     {
-      id: 3,
+      id: 2,
       title: "Sri Lanka Wanithabhimana",
       year: "2023",
       organization: "NDB Bank & Sinhala Media",
-      description:
-        "Prestigious recognition for women who have excelled in their professional fields and contributed significantly to Sri Lankan society",
+      // description:
+      //   "Prestigious recognition for women who have excelled in their professional fields and contributed significantly to Sri Lankan society",
       image: "/images/wanithabhimana-award.jpg",
       position: { left: "58%", top: "80%" },
     },
     {
-      id: 4,
+      id: 3,
       title: "Global CEO Top Businesswomen Awards",
       year: "2025",
       organization: "Global CEO Excellence Awards",
-      description:
-        "Recognized for outstanding leadership and innovation in interior design, acknowledging excellence in entrepreneurship and business management",
+      // description:
+      //   "Recognized for outstanding leadership and innovation in interior design, acknowledging excellence in entrepreneurship and business management",
       image: "/images/global-ceo-award.jpg",
       position: { left: "38%", top: "82%" },
     },
     {
-      id: 5,
+      id: 4,
       title: "Women Entrepreneur Excellence",
       year: "2023",
       organization: "Business Excellence Foundation",
-      description:
-        "Leadership excellence in building and managing a successful interior design enterprise with innovative business strategies",
+      // description:
+      //   "Leadership excellence in building and managing a successful interior design enterprise with innovative business strategies",
       image: "/images/entrepreneur-award.jpg",
       position: { left: "18%", top: "85%" },
     },
@@ -301,9 +301,9 @@ const About = () => {
                             {award.organization}
                           </p>
 
-                          <p className="text-gray-600 text-[13px] leading-relaxed whitespace-normal">
+                          {/* <p className="text-gray-600 text-[13px] leading-relaxed whitespace-normal">
                             {award.description}
-                          </p>
+                          </p> */}
                         </div>
                       </div>
 
