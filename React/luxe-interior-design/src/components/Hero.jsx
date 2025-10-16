@@ -106,7 +106,7 @@ const Hero = () => {
           videoSrc = "/videos/compressed-720p.mp4";
           break;
         default:
-          videoSrc = "/videos/outp1.mp4";
+          videoSrc = "/videos/compressed3.mp4";
       }
       video.src = videoSrc;
     };
