@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+// NOTE: Since this is a single file component for demonstration,
+// the useNavigate import is kept but external routing will not work in this environment.
+
+// Mock navigation function for the environment
+const useNavigate = () => (path) => console.log(`Navigating to: ${path}`);
 
 const slides = [
   {
@@ -60,7 +64,7 @@ const slides = [
   },
 ];
 
-export default function Portfolio() {
+export default function App() {
   const navigate = useNavigate();
   const [activeSlide, setActiveSlide] = useState(0);
   const [activeThumbnail, setActiveThumbnail] = useState(0);
@@ -69,18 +73,62 @@ export default function Portfolio() {
   const [currentX, setCurrentX] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isSlideTransitioning, setIsSlideTransitioning] = useState(false);
-  const sliderRef = useRef(null);
+
+  // State to manage the 1-second pause on the first thumbnail
+  const [isInitialThumbnailPause, setIsInitialThumbnailPause] = useState(false);
+
   const progressInterval = useRef(null);
+
+  // Helper function to manage auto-play and prevent stale closures
+  const handleNext = () => {
+    const currentSlide = slides[activeSlide];
+    const isLastThumbnail =
+      activeThumbnail === currentSlide.thumbnails.length - 1;
+
+    // Check if we need a major slide transition
+    if (isLastThumbnail) {
+      // --- START MAJOR SLIDE TRANSITION (Forward) ---
+      setIsSlideTransitioning(true);
+      setIsInitialThumbnailPause(true); // Stop auto-play immediately
+
+      // Wait for visual transition (1000ms)
+      setTimeout(() => {
+        const nextSlide = (activeSlide + 1) % slides.length;
+
+        // CORRECTED: Direct state updates after the delay
+        setActiveSlide(nextSlide);
+        setActiveThumbnail(0);
+        setIsSlideTransitioning(false);
+
+        // Start the 1000ms pause on the new content (T0)
+        setTimeout(() => {
+          setIsInitialThumbnailPause(false); // Resume auto-play
+          setProgress(0); // Reset progress to start the new loop
+        }, 1000);
+      }, 1000); // Wait for visual transition (1s)
+    } else {
+      // --- NORMAL THUMBNAIL PROGRESSION ---
+      setActiveThumbnail(activeThumbnail + 1);
+      setProgress(0);
+    }
+  };
 
   // Auto-play with progress
   useEffect(() => {
-    if (!isDragging) {
+    // Clear interval on drag or pause state change
+    if (progressInterval.current) {
+      clearInterval(progressInterval.current);
+    }
+
+    // Only start auto-play if not dragging AND not in the initial pause state
+    if (!isDragging && !isInitialThumbnailPause) {
       progressInterval.current = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 100) {
             handleNext();
             return 0;
           }
+          // The auto-play speed remains the same
           return prev + 0.5;
         });
       }, 20);
@@ -91,36 +139,16 @@ export default function Portfolio() {
         clearInterval(progressInterval.current);
       }
     };
-  }, [activeThumbnail, activeSlide, isDragging]);
-
-  const handleNext = () => {
-    const isLastThumbnail =
-      activeThumbnail === slides[activeSlide].thumbnails.length - 1;
-
-    if (isLastThumbnail) {
-      // Trigger big slide transition
-      setIsSlideTransitioning(true);
-
-      setTimeout(() => {
-        const nextSlide = (activeSlide + 1) % slides.length;
-        setActiveSlide(nextSlide);
-        setActiveThumbnail(0);
-
-        setTimeout(() => {
-          setIsSlideTransitioning(false);
-        }, 100);
-      }, 1000);
-    } else {
-      setActiveThumbnail(activeThumbnail + 1);
-    }
-    setProgress(0);
-  };
+    // Added isInitialThumbnailPause to dependencies to control the auto-play loop
+  }, [activeThumbnail, activeSlide, isDragging, isInitialThumbnailPause]);
 
   const handlePrevious = () => {
     if (activeThumbnail > 0) {
       setActiveThumbnail(activeThumbnail - 1);
       setProgress(0);
     } else if (activeSlide > 0) {
+      // For previous transition, we do not require the initial 1s pause
+      // as it lands on the last thumbnail of the previous slide, not the 'first image'.
       setIsSlideTransitioning(true);
 
       setTimeout(() => {
@@ -141,13 +169,24 @@ export default function Portfolio() {
   };
 
   const handleDragStart = (e) => {
+    // Prevent default touch behavior (like vertical scrolling)
+    if (e.type === "touchstart") {
+      // We let the 'touch-action: pan-y' CSS property handle this
+    }
+
     setIsDragging(true);
+    // Pause auto-play immediately when starting a drag
+    setIsInitialThumbnailPause(true);
     setStartX(e.type === "mousedown" ? e.clientX : e.touches[0].clientX);
     setCurrentX(e.type === "mousedown" ? e.clientX : e.touches[0].clientX);
   };
 
   const handleDragMove = (e) => {
     if (!isDragging) return;
+    // Prevent default browser behavior (e.g. rubber-banding or navigation gestures)
+    if (e.type === "touchmove") {
+      e.preventDefault();
+    }
     setCurrentX(e.type === "mousemove" ? e.clientX : e.touches[0].clientX);
   };
 
@@ -159,446 +198,476 @@ export default function Portfolio() {
       if (diff > 0) {
         handlePrevious();
       } else {
-        handleNext();
+        // Use functional update for activeSlide in handleNext to avoid stale state in drag logic
+        const isLastThumbnail =
+          activeThumbnail === slides[activeSlide].thumbnails.length - 1;
+        if (!isLastThumbnail) {
+          setActiveThumbnail((prev) => prev + 1);
+          setProgress(0);
+        } else {
+          // If advancing to the next main slide via drag, use the full transition logic
+          handleNext();
+        }
       }
     }
 
     setIsDragging(false);
     setStartX(0);
     setCurrentX(0);
+    // Resume auto-play after drag is finished
+    setIsInitialThumbnailPause(false);
   };
 
   const currentSlide = slides[activeSlide];
   const dragOffset = isDragging ? (currentX - startX) / 10 : 0;
 
   return (
-    <div className="relative bg-white">
+    <div
+      className="relative bg-white"
+      style={{ minHeight: "100vh", fontFamily: "Inter, sans-serif" }}
+    >
       {/* Portfolio Slider */}
       <div className="relative w-full h-screen overflow-hidden bg-white">
-      {/* Animated Background */}
-      <div className="absolute inset-0">
-        <div
-          key={`bg-${activeSlide}-${activeThumbnail}`}
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${currentSlide.thumbnails[activeThumbnail]})`,
-            transform: isSlideTransitioning ? "scale(1.15)" : "scale(1.05)",
-            filter: isSlideTransitioning
-              ? "brightness(0.7)"
-              : "brightness(1)",
-            transition: "all 1.5s cubic-bezier(0.4, 0.0, 0.2, 1)",
-          }}
-        />
-        <div
-          className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent"
-          style={{
-            opacity: isSlideTransitioning ? 0.3 : 1,
-            transition: "opacity 1s ease-out",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30 transition-opacity duration-1000" />
-      </div>
-
-      {/* Transition Overlay */}
-      {isSlideTransitioning && (
-        <div
-          className="absolute inset-0 z-20 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.8) 100%)",
-            animation: "fadeOverlay 1s ease-in-out",
-          }}
-        />
-      )}
-
-      {/* Content Container */}
-      <div
-        className="relative z-10 flex items-center h-full max-w-[1800px] mx-auto px-12 lg:px-20"
-        style={{
-          opacity: isSlideTransitioning ? 0 : 1,
-          transform: isSlideTransitioning ? "scale(0.95)" : "scale(1)",
-          transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
-        }}
-      >
-        {/* Left Content */}
-        <div className="w-full lg:w-5/12 text-gray-900 space-y-6 pr-8">
-          {/* Slide Counter */}
+        {/* Animated Background */}
+        <div className="absolute inset-0">
           <div
-            className="flex items-center gap-4 text-sm font-medium tracking-wider mb-2"
-            key={`counter-${activeSlide}`}
+            key={`bg-${activeSlide}-${activeThumbnail}`}
+            className="absolute inset-0 bg-cover bg-center"
+            // Use a fallback placeholder image in case the mock paths fail
             style={{
-              animation: isSlideTransitioning
-                ? "fadeOut 0.4s ease-in"
-                : "fadeIn 1s ease-out 0.1s both",
+              backgroundImage: `url(${currentSlide.thumbnails[activeThumbnail]}), url(https://placehold.co/1920x1080/000000/cccccc?text=Architecture)`,
+              transform: isSlideTransitioning ? "scale(1.15)" : "scale(1.05)",
+              // --- EDITED: Added blur(4px) filter for background separation ---
+              filter: isSlideTransitioning
+                ? "brightness(0.7) blur(4px)"
+                : "brightness(1) blur(4px)",
+              transition: "all 1.5s cubic-bezier(0.4, 0.0, 0.2, 1)",
             }}
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-gray-900 font-bold">
-                {String(activeSlide + 1).padStart(2, "0")}
-              </span>
-              <div className="w-12 h-px bg-gradient-to-r from-gray-900 to-transparent" />
-              <span className="text-gray-600">
-                {String(slides.length).padStart(2, "0")}
-              </span>
-            </div>
-          </div>
-
-          {/* Title with Animation */}
-          <h1
-            className="text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-tight text-gray-900 drop-shadow-sm"
-            key={`title-${activeSlide}`}
-            style={{
-              animation: isSlideTransitioning
-                ? "slideOutRight 0.6s ease-in"
-                : "slideInLeft 1s cubic-bezier(0.16, 1, 0.3, 1)",
-              textShadow: "0 4px 20px rgba(0,0,0,0.5)",
-            }}
-          >
-            {currentSlide.title}
-          </h1>
-
-          {/* Subtitle */}
+          />
           <div
-            className="text-gray-700 text-base font-medium tracking-wide"
-            key={`subtitle-${activeSlide}`}
+            className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-transparent"
             style={{
-              animation: isSlideTransitioning
-                ? "fadeOut 0.4s ease-in"
-                : "fadeIn 1s ease-out 0.15s both",
+              opacity: isSlideTransitioning ? 0.3 : 1,
+              transition: "opacity 1s ease-out",
             }}
-          >
-            {currentSlide.subtitle}
-          </div>
-
-          {/* Description */}
-          <p
-            className="text-gray-600 text-base lg:text-lg leading-relaxed max-w-lg"
-            key={`desc-${activeSlide}`}
-            style={{
-              animation: isSlideTransitioning
-                ? "fadeOut 0.4s ease-in"
-                : "fadeIn 1s ease-out 0.3s both",
-            }}
-          >
-            {currentSlide.description}
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex gap-4 mt-4">
-            <button
-              className="group relative px-8 py-4 bg-red-600 hover:bg-red-700 rounded-lg overflow-hidden transition-all duration-500 ease-out hover:shadow-lg hover:shadow-red-500/50 hover:scale-105"
-              style={{
-                animation: isSlideTransitioning
-                  ? "fadeOut 0.4s ease-in"
-                  : "fadeIn 1s ease-out 0.45s both",
-              }}
-            >
-              <span className="relative z-10 font-semibold tracking-wide text-white">
-                Explore Now
-              </span>
-              <div className="absolute inset-0 bg-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </button>
-
-            <button
-              onClick={() => navigate('/products?scrollToHeader=true')}
-              className="group relative px-8 py-4 bg-gray-800 hover:bg-gray-900 rounded-lg overflow-hidden transition-all duration-500 ease-out hover:shadow-lg hover:shadow-gray-500/50 hover:scale-105"
-              style={{
-                animation: isSlideTransitioning
-                  ? "fadeOut 0.4s ease-in"
-                  : "fadeIn 1s ease-out 0.5s both",
-              }}
-            >
-              <span className="relative z-10 font-semibold tracking-wide text-white">
-                View More →
-              </span>
-              <div className="absolute inset-0 bg-gray-900 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            </button>
-          </div>
-
-          {/* Progress Bar */}
-          <div
-            className="flex items-center gap-2 pt-6"
-            style={{
-              opacity: isSlideTransitioning ? 0 : 1,
-              transition: "opacity 0.5s ease-out",
-            }}
-          >
-            {currentSlide.thumbnails.map((_, idx) => (
-              <button
-                key={`progress-bar-${activeSlide}-${idx}`}
-                type="button"
-                className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-white"
-                aria-label={`Go to thumbnail ${idx + 1}`}
-                tabIndex={0}
-                onClick={() => handleThumbnailClick(idx)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    handleThumbnailClick(idx);
-                  }
-                }}
-                style={{ padding: 0, border: "none", background: "none" }}
-              >
-                {(() => {
-                  let barWidth;
-                  if (idx === activeThumbnail) {
-                    barWidth = `${progress}%`;
-                  } else if (idx < activeThumbnail) {
-                    barWidth = "100%";
-                  } else {
-                    barWidth = "0%";
-                  }
-                  return (
-                    <div
-                      className="h-full bg-white transition-all duration-500 ease-out"
-                      style={{
-                        width: barWidth,
-                      }}
-                    />
-                  );
-                })()}
-              </button>
-            ))}
-          </div>
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30 transition-opacity duration-1000" />
         </div>
 
-        {/* Right Slider - Modern Stacked Cards */}
+        {/* Transition Overlay */}
+        {isSlideTransitioning && (
+          <div
+            className="absolute inset-0 z-20 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.8) 100%)",
+              animation: "fadeOverlay 1s ease-in-out",
+            }}
+          />
+        )}
+
+        {/* Content Container - NOW THE PRIMARY SWIPE TARGET FOR MOBILE */}
         <div
-          className="hidden lg:flex w-7/12 justify-center items-center pl-16"
+          className="relative z-10 flex items-center h-full max-w-[1800px] mx-auto px-6 sm:px-12 lg:px-20"
+          tabIndex={0} // Make focusable for keyboard navigation
           style={{
-            opacity: isSlideTransitioning ? 0.5 : 1,
-            transition: "opacity 0.8s ease-out",
+            opacity: isSlideTransitioning ? 0 : 1,
+            transform: isSlideTransitioning ? "scale(0.95)" : "scale(1)",
+            transition: "all 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
+            touchAction: "pan-y", // Allow horizontal pan but control vertical scroll
+          }}
+          // --- DRAG HANDLERS MOVED HERE FOR MOBILE RESPONSIVENESS ---
+          onMouseDown={handleDragStart}
+          onMouseMove={handleDragMove}
+          onMouseUp={handleDragEnd}
+          onMouseLeave={handleDragEnd}
+          onTouchStart={handleDragStart}
+          onTouchMove={handleDragMove}
+          onTouchEnd={handleDragEnd}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowLeft") {
+              handlePrevious();
+            } else if (e.key === "ArrowRight") {
+              handleNext();
+            }
           }}
         >
-          <div className="relative w-full h-[600px]">
-            {/* Navigation Arrows */}
-            <button
-              onClick={handlePrevious}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-20 z-30 w-12 h-12 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-500 ease-out hover:scale-110"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-
-            <button
-              onClick={handleNext}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-20 z-30 w-12 h-12 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-500 ease-out hover:scale-110"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-
-            {/* Cards Stack */}
+          {/* Left Content */}
+          <div className="w-full lg:w-5/12 text-white space-y-6 pr-0 lg:pr-8 pt-20 lg:pt-0">
+            {/* Slide Counter */}
             <div
-              className="relative w-full h-full flex items-center justify-center perspective-3d"
-              aria-label="Thumbnails slider"
-              role="listbox"
-              tabIndex={0}
+              className="flex items-center gap-4 text-sm font-medium tracking-wider mb-2"
+              key={`counter-${activeSlide}`}
               style={{
-                transition: "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-              }}
-              onMouseDown={handleDragStart}
-              onMouseMove={handleDragMove}
-              onMouseUp={handleDragEnd}
-              onMouseLeave={handleDragEnd}
-              onTouchStart={handleDragStart}
-              onTouchMove={handleDragMove}
-              onTouchEnd={handleDragEnd}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowLeft") {
-                  handlePrevious();
-                } else if (e.key === "ArrowRight") {
-                  handleNext();
-                }
+                animation: isSlideTransitioning
+                  ? "fadeOut 0.4s ease-in"
+                  : "fadeIn 1s ease-out 0.1s both",
               }}
             >
-              {currentSlide.thumbnails.map((thumb, index) => {
-                const offset = index - activeThumbnail;
-                const isActive = index === activeThumbnail;
-                const absOffset = Math.abs(offset);
+              <div className="flex items-center gap-2">
+                <span className="text-white font-bold">
+                  {String(activeSlide + 1).padStart(2, "0")}
+                </span>
+                <div className="w-12 h-px bg-white/50" />
+                <span className="text-gray-400">
+                  {String(slides.length).padStart(2, "0")}
+                </span>
+              </div>
+            </div>
 
-                // Extracted ternary operations
-                const translateZValue = isActive ? 0 : -absOffset * 100;
-                const scaleValue = isActive ? 1 : 1 - absOffset * 0.15;
-                const opacityValue = isSlideTransitioning
-                  ? 0
-                  : absOffset > 1
-                  ? 0
-                  : 1;
-                const pointerEventsValue = absOffset > 1 ? "none" : "auto";
+            {/* Title with Animation */}
+            <h1
+              className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-tight text-white drop-shadow-sm"
+              key={`title-${activeSlide}`}
+              style={{
+                animation: isSlideTransitioning
+                  ? "slideOutRight 0.6s ease-in"
+                  : "slideInLeft 1s cubic-bezier(0.16, 1, 0.3, 1)",
+                textShadow: "0 4px 20px rgba(0,0,0,0.5)",
+              }}
+            >
+              {currentSlide.title}
+            </h1>
 
-                // Keyboard accessibility handler
-                const handleKeyDown = (e) => {
-                  if (!isActive && (e.key === "Enter" || e.key === " ")) {
-                    handleThumbnailClick(index);
-                  }
-                };
+            {/* Subtitle */}
+            <div
+              className="text-white text-base font-medium tracking-wide"
+              key={`subtitle-${activeSlide}`}
+              style={{
+                animation: isSlideTransitioning
+                  ? "fadeOut 0.4s ease-in"
+                  : "fadeIn 1s ease-out 0.15s both",
+              }}
+            >
+              {currentSlide.subtitle}
+            </div>
 
-                return (
-                  <div
-                    key={`card-${activeSlide}-${index}`}
-                    role={!isActive ? "button" : undefined}
-                    tabIndex={!isActive ? 0 : undefined}
-                    aria-pressed={isActive}
-                    onClick={() => !isActive && handleThumbnailClick(index)}
-                    onKeyDown={handleKeyDown}
-                    className="absolute cursor-pointer w-[400px] h-[550px]"
-                    style={{
-                      transform: isSlideTransitioning
-                        ? `translateX(${
-                            offset * 120
-                          }px) translateZ(-200px) scale(0.8) rotateY(${
-                            offset * -8 + 30
-                          }deg)`
-                        : `
-                          translateX(${offset * 120 + dragOffset}px)
-                          translateZ(${translateZValue}px)
-                          scale(${scaleValue})
-                          rotateY(${offset * -8}deg)
-                        `,
-                      zIndex: 10 - absOffset,
-                      opacity: opacityValue,
-                      pointerEvents: pointerEventsValue,
-                      transition: isDragging
-                        ? "none"
-                        : "all 1s cubic-bezier(0.16, 1, 0.3, 1)",
-                      transformStyle: "preserve-3d",
-                    }}
-                  >
-                    {/* Border */}
+            {/* Description */}
+            <p
+              className="text-white/80 text-base lg:text-lg leading-relaxed max-w-lg"
+              key={`desc-${activeSlide}`}
+              style={{
+                animation: isSlideTransitioning
+                  ? "fadeOut 0.4s ease-in"
+                  : "fadeIn 1s ease-out 0.3s both",
+              }}
+            >
+              {currentSlide.description}
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex gap-4 mt-6">
+              <button
+                onClick={() => navigate("/products?scrollToHeader=true")}
+                className="group relative px-8 py-4 bg-red-600 hover:bg-red-700 rounded-xl overflow-hidden transition-all duration-500 ease-out hover:shadow-xl hover:shadow-red-500/50 hover:scale-[1.02]"
+                style={{
+                  animation: isSlideTransitioning
+                    ? "fadeOut 0.4s ease-in"
+                    : "fadeIn 1s ease-out 0.5s both",
+                }}
+              >
+                <span className="relative z-10 font-semibold tracking-wide text-white">
+                  Explore Now →
+                </span>
+                <div className="absolute inset-0 bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              </button>
+            </div>
+
+            {/* Progress Bar */}
+            <div
+              className="flex items-center gap-2 pt-6"
+              style={{
+                opacity: isSlideTransitioning ? 0 : 1,
+                transition: "opacity 0.5s ease-out",
+              }}
+            >
+              {currentSlide.thumbnails.map((_, idx) => (
+                <button
+                  key={`progress-bar-${activeSlide}-${idx}`}
+                  type="button"
+                  className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/80"
+                  aria-label={`Go to thumbnail ${idx + 1}`}
+                  tabIndex={0}
+                  onClick={() => handleThumbnailClick(idx)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      handleThumbnailClick(idx);
+                    }
+                  }}
+                  style={{ padding: 0, border: "none", background: "none" }}
+                >
+                  {(() => {
+                    let barWidth;
+                    if (idx === activeThumbnail) {
+                      // Pause the progress bar accumulation during the initial pause
+                      barWidth = isInitialThumbnailPause
+                        ? "0%"
+                        : `${progress}%`;
+                    } else if (idx < activeThumbnail) {
+                      barWidth = "100%";
+                    } else {
+                      barWidth = "0%";
+                    }
+                    return (
+                      <div
+                        className="h-full bg-white transition-all duration-500 ease-out"
+                        style={{
+                          width: barWidth,
+                        }}
+                      />
+                    );
+                  })()}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Slider - Modern Stacked Cards (Hidden on mobile) */}
+          <div
+            className="hidden lg:flex w-7/12 justify-center items-center pl-16"
+            style={{
+              opacity: isSlideTransitioning ? 0.5 : 1,
+              transition: "opacity 0.8s ease-out",
+            }}
+          >
+            <div className="relative w-full h-[600px]">
+              {/* Navigation Arrows (Visible only on desktop) */}
+              <button
+                onClick={handlePrevious}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-20 z-30 w-12 h-12 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-500 ease-out hover:scale-110 shadow-lg"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+
+              <button
+                onClick={handleNext}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-20 z-30 w-12 h-12 flex items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-500 ease-out hover:scale-110 shadow-lg"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+
+              {/* Cards Stack */}
+              <div
+                className="relative w-full h-full flex items-center justify-center perspective-3d"
+                aria-label="Thumbnails slider"
+                role="listbox"
+                // Drag handlers removed from here and moved to parent Content Container
+              >
+                {currentSlide.thumbnails.map((thumb, index) => {
+                  const offset = index - activeThumbnail;
+                  const isActive = index === activeThumbnail;
+                  const absOffset = Math.abs(offset);
+
+                  // Calculate subtle Z-rotation based on drag
+                  const rotationZ = isDragging ? (currentX - startX) / 100 : 0;
+
+                  // Extracted ternary operations
+                  const translateZValue = isActive ? 0 : -absOffset * 100;
+                  const scaleValue = isActive ? 1 : 1 - absOffset * 0.15;
+                  const opacityValue = isSlideTransitioning
+                    ? 0
+                    : absOffset > 2 // Show up to 2 cards behind
+                    ? 0
+                    : 1;
+                  const pointerEventsValue = absOffset > 1 ? "none" : "auto";
+
+                  // Keyboard accessibility handler
+                  const handleKeyDown = (e) => {
+                    if (!isActive && (e.key === "Enter" || e.key === " ")) {
+                      handleThumbnailClick(index);
+                    }
+                  };
+
+                  return (
                     <div
-                      className={`absolute inset-0 rounded-3xl transition-all duration-1000 ${
-                        isActive ? "bg-white p-[4px]" : "bg-white/30 p-[2px]"
-                      }`}
+                      key={`card-${activeSlide}-${index}`}
+                      role={!isActive ? "button" : undefined}
+                      tabIndex={!isActive ? 0 : undefined}
+                      aria-pressed={isActive}
+                      onClick={() => !isActive && handleThumbnailClick(index)}
+                      onKeyDown={handleKeyDown}
+                      className="absolute cursor-pointer w-[400px] h-[550px] transform-gpu"
+                      style={{
+                        transform: isSlideTransitioning
+                          ? `translateX(${
+                              offset * 120
+                            }px) translateZ(-200px) scale(0.8) rotateY(${
+                              offset * -8 + 30
+                            }deg)`
+                          : `
+                            translateX(${offset * 120 + dragOffset}px)
+                            translateZ(${translateZValue}px)
+                            scale(${scaleValue})
+                            rotateY(${offset * -8}deg)
+                            rotateZ(${rotationZ}deg) /* ENHANCEMENT: subtle tilt during drag */
+                          `,
+                        zIndex: 10 - absOffset,
+                        opacity: opacityValue,
+                        pointerEvents: pointerEventsValue,
+                        transition: isDragging
+                          ? "none"
+                          : "all 1s cubic-bezier(0.16, 1, 0.3, 1)",
+                        transformStyle: "preserve-3d",
+                        backfaceVisibility: "hidden",
+                      }}
                     >
-                      <div className="relative w-full h-full rounded-3xl overflow-hidden bg-black">
-                        {/* Image */}
-                        <img
-                          src={thumb}
-                          alt={`View ${index + 1}`}
-                          className="w-full h-full object-cover"
-                          draggable="false"
-                          style={{
-                            transform: isActive ? "scale(1)" : "scale(1.1)",
-                            transition:
-                              "transform 1s cubic-bezier(0.16, 1, 0.3, 1)",
-                          }}
-                        />
-
-                        {/* Gradient Overlay */}
-                        <div
-                          className={`absolute inset-0 transition-all duration-1000 ${
-                            isActive
-                              ? "bg-gradient-to-t from-black/50 via-transparent to-transparent"
-                              : "bg-black/40"
-                          }`}
-                        />
-
-                        {/* Active Card Content */}
-                        {isActive && (
-                          <div
-                            className="absolute bottom-0 left-0 right-0 p-6 text-white transition-opacity duration-700"
-                            style={{
-                              animation: "fadeIn 0.8s ease-out 0.3s both",
+                      {/* Border */}
+                      <div
+                        className={`absolute inset-0 rounded-3xl transition-all duration-1000 shadow-2xl ${
+                          isActive
+                            ? "bg-white p-[4px] animate-glowPulse" // Active card glow
+                            : "bg-white/30 p-[2px]"
+                        }`}
+                      >
+                        <div className="relative w-full h-full rounded-3xl overflow-hidden bg-black">
+                          {/* Image */}
+                          <img
+                            src={thumb}
+                            alt={`View ${index + 1} of ${currentSlide.title}`}
+                            className="w-full h-full object-cover"
+                            draggable="false"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src =
+                                "https://placehold.co/400x550/333333/ffffff?text=Image+Missing";
                             }}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                                <span className="text-sm font-medium">
-                                  Active
-                                </span>
-                              </div>
-                              <span className="text-sm font-medium text-white/80">
-                                {index + 1} / {currentSlide.thumbnails.length}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Shine Effect */}
-                        {isActive && (
-                          <div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"
                             style={{
-                              animation: "shine 5s ease-in-out infinite",
+                              transform: isActive ? "scale(1)" : "scale(1.1)",
+                              transition:
+                                "transform 1s cubic-bezier(0.16, 1, 0.3, 1)",
                             }}
                           />
-                        )}
+
+                          {/* Gradient Overlay */}
+                          <div
+                            className={`absolute inset-0 transition-all duration-1000 ${
+                              isActive
+                                ? "bg-gradient-to-t from-black/50 via-transparent to-transparent"
+                                : "bg-black/40"
+                            }`}
+                          />
+
+                          {/* Active Card Content */}
+                          {isActive && (
+                            <div
+                              className="absolute bottom-0 left-0 right-0 p-6 text-white transition-opacity duration-700"
+                              style={{
+                                animation: "fadeInUp 0.8s ease-out 0.3s both",
+                              }}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                                  <span className="text-sm font-medium uppercase tracking-wider">
+                                    Active View
+                                  </span>
+                                </div>
+                                <span className="text-sm font-medium text-white/80">
+                                  {index + 1} / {currentSlide.thumbnails.length}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Shine Effect */}
+                          {isActive && (
+                            <div
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none"
+                              style={{
+                                animation: "shine 5s ease-in-out infinite",
+                              }}
+                            />
+                          )}
+                        </div>
                       </div>
+                      {/* Card Shadow */}
+                      <div
+                        className={`absolute inset-0 -z-10 rounded-3xl transition-all duration-1000 ${
+                          isActive
+                            ? "bg-black/80 shadow-2xl"
+                            : "bg-black/60 shadow-xl"
+                        }`}
+                        style={{
+                          transform: "translateY(20px) scale(0.95)",
+                          filter: isActive ? "blur(20px)" : "blur(10px)",
+                          opacity: isActive ? 0.7 : 0.5,
+                        }}
+                      />
                     </div>
-                    {/* Card Shadow */}
-                    <div
-                      className={`absolute inset-0 -z-10 rounded-3xl transition-all duration-1000 ${
-                        isActive ? "bg-white/30" : "bg-black/60"
-                      }`}
-                      style={{
-                        transform: "translateY(20px)",
-                      }}
-                    />
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Slide Navigation */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-3 z-20">
-        {slides.map((slide, index) => (
-          <button
-            key={slide.id}
-            onClick={() => {
-              if (index !== activeSlide) {
-                setIsSlideTransitioning(true);
-                setTimeout(() => {
-                  setActiveSlide(index);
-                  setActiveThumbnail(0);
-                  setProgress(0);
+        {/* Main Slide Navigation */}
+        <div className="absolute bottom-6 sm:bottom-12 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+          {slides.map((slide, index) => (
+            <button
+              key={slide.id}
+              onClick={() => {
+                if (index !== activeSlide) {
+                  setIsSlideTransitioning(true);
+                  // Stop auto-play immediately
+                  setIsInitialThumbnailPause(true);
+
                   setTimeout(() => {
-                    setIsSlideTransitioning(false);
-                  }, 100);
-                }, 1000);
-              }
-            }}
-            className="group relative"
-          >
-            <div
-              className={`transition-all duration-500 ease-out rounded-full ${
-                index === activeSlide
-                  ? "w-10 h-3 bg-white"
-                  : "w-3 h-3 bg-white/40 hover:bg-white/60"
-              }`}
-            />
-          </button>
-        ))}
-      </div>
+                    // After 1000ms (Visual transition)
+                    setActiveSlide(index);
+                    setActiveThumbnail(0);
 
-      {/* CSS Animations */}
-      <style>{`
+                    setIsSlideTransitioning(false); // End visual transition
+
+                    // Start the 1000ms pause on the new content (T0)
+                    setTimeout(() => {
+                      setIsInitialThumbnailPause(false); // Resume auto-play
+                      setProgress(0); // Reset progress
+                    }, 1000);
+                  }, 1000);
+                }
+              }}
+              className="group relative"
+              aria-label={`Go to slide ${index + 1}: ${slide.title}`}
+            >
+              <div
+                className={`transition-all duration-500 ease-out rounded-full ${
+                  index === activeSlide
+                    ? "w-10 h-3 bg-red-600 shadow-md shadow-red-500/50"
+                    : "w-3 h-3 bg-white/40 hover:bg-white/60"
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+
+        {/* CSS Animations */}
+        <style>{`
         @keyframes slideInLeft {
           from {
             opacity: 0;
@@ -621,7 +690,7 @@ export default function Portfolio() {
           }
         }
 
-        @keyframes fadeIn {
+        @keyframes fadeInUp {
           from {
             opacity: 0;
             transform: translateY(30px);
@@ -663,17 +732,22 @@ export default function Portfolio() {
             transform: translateX(200%) skewX(-15deg);
           }
         }
+        
+        @keyframes glowPulse {
+          0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.2); }
+          50% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.9), 0 0 30px rgba(255, 255, 255, 0.4); }
+        }
 
         .perspective-3d {
           perspective: 2000px;
           transform-style: preserve-3d;
         }
 
-        * {
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
+        .animate-glowPulse {
+          animation: glowPulse 2.5s ease-in-out infinite;
         }
 
+        /* Responsive adjustments */
         @media (max-width: 1024px) {
           .perspective-3d {
             perspective: 1000px;

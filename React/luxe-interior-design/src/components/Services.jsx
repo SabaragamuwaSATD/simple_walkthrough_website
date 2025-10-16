@@ -185,7 +185,11 @@ const Services = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} id="services" className="py-25 mb-20">
+    <section
+      ref={sectionRef}
+      id="services"
+      className="py-25 mb-20 z-10 bg-white"
+    >
       <h2
         ref={titleRef}
         className="text-[42px] text-center mb-16 text-[#2c3e50] font-light tracking-[2px]"
