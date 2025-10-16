@@ -12,9 +12,9 @@ const ModernParallax = () => {
         const scrollProgress = -rect.top / (rect.height - window.innerHeight);
         setScrollY(scrollProgress);
 
-        // Check if the parallax section is still in view
-        const sectionBottom = rect.bottom;
-        setIsInView(sectionBottom > 0);
+        // Only show fixed layers while any part intersects viewport
+        const inView = rect.top < window.innerHeight && rect.bottom > 0;
+        setIsInView(inView);
       }
     };
 
@@ -24,16 +24,20 @@ const ModernParallax = () => {
   }, []);
 
   return (
-    <div className="w-full bg-gray-900 pb-10">
+    <div
+      className="w-full bg-gray-900 pb-10 relative"
+      style={{ zIndex: 0, isolation: "isolate" }}
+    >
       {/* Hero Section with Parallax */}
       <div ref={containerRef} className="relative h-[200vh] overflow-hidden">
         {/* Background Layer - Slowest */}
         <div
-          className="fixed top-0 left-0 w-full h-screen"
+          className="fixed top-0 left-0 w-full h-screen z-0"
           style={{
             transform: `translateY(${scrollY * 50}px)`,
             transition: "transform 0.1s ease-out",
             display: isInView ? "block" : "none",
+            pointerEvents: "none",
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-transparent to-gray-900 z-10" />
@@ -46,7 +50,7 @@ const ModernParallax = () => {
 
         {/* Mid Layer - Medium Speed */}
         <div
-          className="fixed top-0 left-0 w-full h-screen flex items-center justify-center"
+          className="fixed top-0 left-0 w-full h-screen flex items-center justify-center z-[1]"
           style={{
             transform: `translateY(${scrollY * 150}px) scale(${
               1 + scrollY * 0.2
@@ -54,6 +58,7 @@ const ModernParallax = () => {
             opacity: Math.max(0, 1 - scrollY * 1.5),
             transition: "transform 0.1s ease-out, opacity 0.1s ease-out",
             display: isInView ? "flex" : "none",
+            pointerEvents: "none",
           }}
         >
           <img
@@ -65,7 +70,7 @@ const ModernParallax = () => {
 
         {/* Overlay Pattern - Fast */}
         <div
-          className="fixed top-0 left-0 w-full h-screen pointer-events-none"
+          className="fixed top-0 left-0 w-full h-screen pointer-events-none z-[2]"
           style={{
             transform: `translateY(${scrollY * 200}px)`,
             opacity: Math.max(0, 1 - scrollY * 2),
@@ -78,12 +83,13 @@ const ModernParallax = () => {
 
         {/* Text Content - Fastest */}
         <div
-          className="fixed top-0 left-0 w-full h-screen flex flex-col items-center justify-center z-20"
+          className="fixed top-0 left-0 w-full h-screen flex flex-col items-center justify-center z-[3]"
           style={{
             transform: `translateY(${scrollY * 300}px)`,
             opacity: Math.max(0, 1 - scrollY * 1.2),
             transition: "transform 0.1s ease-out, opacity 0.1s ease-out",
             display: isInView ? "flex" : "none",
+            pointerEvents: isInView ? "auto" : "none",
           }}
         >
           <div className="text-center px-8">
@@ -107,11 +113,12 @@ const ModernParallax = () => {
 
         {/* Scroll Indicator */}
         <div
-          className="fixed bottom-12 left-1/2 transform -translate-x-1/2 z-20"
+          className="fixed bottom-12 left-1/2 transform -translate-x-1/2 z-[4]"
           style={{
             opacity: Math.max(0, 1 - scrollY * 3),
             transition: "opacity 0.3s ease-out",
             display: isInView ? "block" : "none",
+            pointerEvents: "none",
           }}
         >
           <div className="flex flex-col items-center gap-2 text-white animate-bounce">
@@ -133,8 +140,8 @@ const ModernParallax = () => {
         </div>
       </div>
 
-      {/* Content Section with Clear Background and Glass Effects */}
-      <div className="relative h-screen overflow-hidden">
+      {/* Content Section */}
+      <div className="relative h-screen overflow-hidden" style={{ zIndex: 1 }}>
         {/* Clear Background Image - Fixed within this section only */}
         <div className="absolute inset-0 z-0">
           <img
@@ -200,9 +207,9 @@ const ModernParallax = () => {
                 // description:
                 //   "Tailored designs that perfectly match your lifestyle and preferences",
               },
-            ].map((feature, idx) => (
+            ].map((feature) => (
               <div
-                key={idx}
+                key={feature.title}
                 className="bg-white/15 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-2xl hover:bg-white/20 hover:border-white/40 transition-all duration-300 transform hover:scale-105 hover:shadow-3xl"
               >
                 <div className="w-12 h-12 bg-gradient-to-br from-red-600/90 to-gray-800 backdrop-blur-sm rounded-full mb-4 flex items-center justify-center border border-red-500/50 shadow-lg">
