@@ -725,11 +725,6 @@ const ProductPage = () => {
                           </svg>
                         </div>
                       </div>
-
-                      {/* Image quality indicator */}
-                      <div className="absolute top-4 right-4 bg-white/90 text-gray-900 px-2 py-1 rounded text-xs font-medium">
-                        HD Quality
-                      </div>
                     </div>
                   </div>
                 </div>
