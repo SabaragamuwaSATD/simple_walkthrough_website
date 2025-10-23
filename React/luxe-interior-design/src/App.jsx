@@ -15,7 +15,10 @@ const HomePage = () => {
   return (
     <>
       {/* Parallax Background - Lowest z-index */}
-      <div style={{ position: "relative", zIndex: 1, isolation: "isolate" }}>
+      <div
+        id="home"
+        style={{ position: "relative", zIndex: 1, isolation: "isolate" }}
+      >
         <ModernParallax />
       </div>
 
@@ -26,6 +29,7 @@ const HomePage = () => {
 
       {/* Services Section - Higher z-index with white background */}
       <div
+        id="services"
         style={{
           position: "relative",
           zIndex: 100,
@@ -38,6 +42,7 @@ const HomePage = () => {
 
       {/* Portfolio Section - Higher z-index */}
       <div
+        id="portfolio"
         style={{
           position: "relative",
           zIndex: 100,
@@ -50,6 +55,7 @@ const HomePage = () => {
 
       {/* About Section - Higher z-index */}
       <div
+        id="about"
         style={{
           position: "relative",
           zIndex: 100,
@@ -62,6 +68,7 @@ const HomePage = () => {
 
       {/* Contact Section - Higher z-index */}
       <div
+        id="contact"
         style={{
           position: "relative",
           zIndex: 100,
@@ -91,11 +98,9 @@ const App = () => {
   return (
     <Router>
       <div style={{ position: "relative", minHeight: "100vh" }}>
-        {/* Navbar - Always on top */}
         <div style={{ position: "relative", zIndex: 1000 }}>
           <Navbar />
         </div>
-
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<ProductPage />} />

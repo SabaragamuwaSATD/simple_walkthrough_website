@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-
-const useNavigate = () => (path) => console.log(`Navigating to: ${path}`);
+import { useNavigate } from "react-router-dom";
 
 const slides = [
   {
@@ -512,7 +511,7 @@ export default function App() {
             {/* CTA Buttons */}
             <div className="flex gap-4 mt-6">
               <button
-                onClick={() => navigate("/products?scrollToHeader=true")}
+                onClick={() => navigate("/products")}
                 className="group relative px-8 py-4 bg-red-600 hover:bg-red-700 rounded-xl overflow-hidden transition-all duration-500 ease-out hover:shadow-xl hover:shadow-red-500/50 hover:scale-[1.02]"
                 style={{
                   animation: isSlideTransitioning
