@@ -1,12 +1,33 @@
 import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleNavClick = (e, sectionId) => {
+    // Prevent default anchor behavior
+    if (e && e.preventDefault) e.preventDefault();
+
+    // If already on homepage, just scroll to the section
+    if (location.pathname === "/") {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } else {
+      // Otherwise navigate to home and pass the section id in state
+      navigate("/", { state: { scrollTo: sectionId } });
+    }
+  };
+
   return (
     <nav className="fixed top-0 w-full bg-black/40 backdrop-blur-lg p-4 flex justify-between items-center shadow-lg z-50 border-b border-white/10">
       {/* Left group: logo + company name */}
       <div className="flex items-center gap-3">
         <a
           href="#home"
+          onClick={(e) => handleNavClick(e, "home")}
           className="logo flex items-center justify-center w-11 h-11 bg-gray-900 border border-red-500 rounded-lg"
         >
           <img
@@ -17,6 +38,7 @@ const Navbar = () => {
         </a>
         <a
           href="#home"
+          onClick={(e) => handleNavClick(e, "home")}
           className="text-white text-sm md:text-base tracking-wide hover:text-red-500 transition-colors duration-300"
         >
           DM Interior Studio
@@ -33,6 +55,7 @@ const Navbar = () => {
         <li>
           <a
             href="#home"
+            onClick={(e) => handleNavClick(e, "home")}
             className="text-white text-sm uppercase tracking-wide hover:text-red-500 transition-colors duration-300"
           >
             Home
@@ -41,6 +64,7 @@ const Navbar = () => {
         <li>
           <a
             href="#services"
+            onClick={(e) => handleNavClick(e, "services")}
             className="text-white text-sm uppercase tracking-wide hover:text-red-500 transition-colors duration-300"
           >
             Services
@@ -49,6 +73,7 @@ const Navbar = () => {
         <li>
           <a
             href="#portfolio"
+            onClick={(e) => handleNavClick(e, "portfolio")}
             className="text-white text-sm uppercase tracking-wide hover:text-red-500 transition-colors duration-300"
           >
             Portfolio
@@ -57,6 +82,7 @@ const Navbar = () => {
         <li>
           <a
             href="#about"
+            onClick={(e) => handleNavClick(e, "about")}
             className="text-white text-sm uppercase tracking-wide hover:text-red-500 transition-colors duration-300"
           >
             About
@@ -65,6 +91,7 @@ const Navbar = () => {
         <li>
           <a
             href="#contact"
+            onClick={(e) => handleNavClick(e, "contact")}
             className="text-white text-sm uppercase tracking-wide hover:text-red-500 transition-colors duration-300"
           >
             Contact
