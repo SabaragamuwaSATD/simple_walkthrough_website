@@ -732,7 +732,7 @@ const ProductPage = () => {
             })}
           </div>
         </div>
-      )}
+      </div>
 
       {/* Other Categories - Simple Grid */}
       {activeCategory !== "House" && (
