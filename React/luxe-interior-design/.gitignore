@@ -109,3 +109,5 @@ temp/
 
 # React specific
 .eslintrc.cjs
+
+public/videos/original.mp4

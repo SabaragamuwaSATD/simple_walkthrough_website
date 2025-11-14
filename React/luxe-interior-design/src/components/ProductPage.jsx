@@ -255,7 +255,7 @@ const ImageModal = ({
                         transition={{ delay: 0.4 }}
                         className="inline-block bg-red-600 text-white px-3 py-1 rounded-full text-xs font-medium mb-2"
                       >
-                        {project.category}({currentIndex + 1})
+                        home({currentIndex + 1})
                       </motion.div>
                       <motion.h3
                         initial={{ x: -20, opacity: 0 }}
@@ -367,27 +367,6 @@ const ProductPage = () => {
         image: "/images/Viana.jpg",
         description: "Premium residential development with modern amenities.",
       },
-      {
-        id: 2,
-        title: "Modern Residential Building",
-        category: "Residentials",
-        image: "/images/home (1).jpeg",
-        description: "Contemporary residential architecture with sleek design.",
-      },
-      {
-        id: 3,
-        title: "Urban Residential Tower",
-        category: "Residentials",
-        image: "/images/home (2).jpeg",
-        description: "High-rise residential complex with premium facilities.",
-      },
-      {
-        id: 4,
-        title: "Residential Community",
-        category: "Residentials",
-        image: "/images/home (3).jpeg",
-        description: "Integrated living spaces with community features.",
-      },
     ],
     "Corporate offices": [
       {
@@ -396,27 +375,6 @@ const ProductPage = () => {
         category: "Corporate offices",
         image: "/images/CLB1.jpg",
         description: "Contemporary office space designed for productivity.",
-      },
-      {
-        id: 2,
-        title: "Executive Office Suite",
-        category: "Corporate offices",
-        image: "/images/DmOffice.jpg",
-        description: "Sophisticated workspace for corporate leadership.",
-      },
-      {
-        id: 3,
-        title: "Tech Corporate Campus",
-        category: "Corporate offices",
-        image: "/images/home (4).jpeg",
-        description: "Innovative office design for technology companies.",
-      },
-      {
-        id: 4,
-        title: "Business Center Design",
-        category: "Corporate offices",
-        image: "/images/home (5).jpeg",
-        description: "Professional business environment with modern amenities.",
       },
     ],
     "Retail Showrooms": [
@@ -427,27 +385,6 @@ const ProductPage = () => {
         image: "/images/NS1.jpg",
         description: "Elegant retail showroom with modern design elements.",
       },
-      {
-        id: 2,
-        title: "Luxury Brand Showroom",
-        category: "Retail Showrooms",
-        image: "/images/CLB1.jpg",
-        description: "High-end retail environment for premium brands.",
-      },
-      {
-        id: 3,
-        title: "Contemporary Retail Gallery",
-        category: "Retail Showrooms",
-        image: "/images/Viana.jpg",
-        description: "Modern showroom with artistic display features.",
-      },
-      {
-        id: 4,
-        title: "Flagship Store Design",
-        category: "Retail Showrooms",
-        image: "/images/home (6).jpeg",
-        description: "Signature retail space with unique brand identity.",
-      },
     ],
     "DM Factory Complex": [
       {
@@ -456,27 +393,6 @@ const ProductPage = () => {
         category: "DM Factory Complex",
         image: "/images/SEBSA1.jpg",
         description: "Modern industrial facility with functional design.",
-      },
-      {
-        id: 2,
-        title: "Manufacturing Plant",
-        category: "DM Factory Complex",
-        image: "/images/NS1.jpg",
-        description: "Efficient production facility with modern infrastructure.",
-      },
-      {
-        id: 3,
-        title: "Factory Warehouse",
-        category: "DM Factory Complex",
-        image: "/images/CLB1.jpg",
-        description: "Large-scale storage and production facility.",
-      },
-      {
-        id: 4,
-        title: "Industrial Park Development",
-        category: "DM Factory Complex",
-        image: "/images/home (1).jpeg",
-        description: "Comprehensive industrial complex with multiple units.",
       },
     ],
     "Restaurants and Coffee bars": [
@@ -487,27 +403,6 @@ const ProductPage = () => {
         image: "/images/DmOffice.jpg",
         description: "Contemporary dining space with welcoming atmosphere.",
       },
-      {
-        id: 2,
-        title: "Elegant Coffee Bar",
-        category: "Restaurants and Coffee bars",
-        image: "/images/about.jpg",
-        description: "Stylish coffee shop with cozy ambiance.",
-      },
-      {
-        id: 3,
-        title: "Fine Dining Restaurant",
-        category: "Restaurants and Coffee bars",
-        image: "/images/Viana.jpg",
-        description: "Upscale restaurant with refined interior design.",
-      },
-      {
-        id: 4,
-        title: "Casual Dining Space",
-        category: "Restaurants and Coffee bars",
-        image: "/images/home (2).jpeg",
-        description: "Comfortable restaurant for casual dining experience.",
-      },
     ],
     Hotels: [
       {
@@ -516,27 +411,6 @@ const ProductPage = () => {
         category: "Hotels",
         image: "/images/about.jpg",
         description: "Elegant hotel interior with premium finishes.",
-      },
-      {
-        id: 2,
-        title: "Boutique Hotel Suite",
-        category: "Hotels",
-        image: "/images/Viana.jpg",
-        description: "Intimate hotel space with personalized design.",
-      },
-      {
-        id: 3,
-        title: "Five-Star Hotel Lobby",
-        category: "Hotels",
-        image: "/images/CLB1.jpg",
-        description: "Grand hotel entrance with luxurious details.",
-      },
-      {
-        id: 4,
-        title: "Resort Hotel Complex",
-        category: "Hotels",
-        image: "/images/home (3).jpeg",
-        description: "Comprehensive resort facility with modern amenities.",
       },
     ],
   };
@@ -705,157 +579,217 @@ const ProductPage = () => {
         </div>
       </div>
 
-      {/* Vertical Image Slider - All Categories */}
-      <div ref={containerRef} className="max-w-7xl mx-auto px-4 py-8 relative">
-        <h2 className="text-2xl font-light text-gray-900 mb-8 text-center">
-          {activeCategory} Projects
-        </h2>
+      {/* Vertical Image Slider - House Category */}
+      {activeCategory === "House" && (
+        <div
+          ref={containerRef}
+          className="max-w-7xl mx-auto px-4 py-8 relative"
+        >
+          <h2 className="text-2xl font-light text-gray-900 mb-8 text-center">
+            House Projects
+          </h2>
 
-        {/* Animated Progress Line */}
-        <div className="absolute left-1/2 top-20 bottom-20 w-1 -translate-x-1/2 z-10">
-          {/* Background line */}
-          <div className="absolute inset-0 bg-gray-200 rounded-full"></div>
+          {/* Animated Progress Line */}
+          <div className="absolute left-1/2 top-20 bottom-20 w-1 -translate-x-1/2 z-10">
+            {/* Background line */}
+            <div className="absolute inset-0 bg-gray-200 rounded-full"></div>
 
-          {/* Animated progress line */}
-          <div
-            className="absolute top-0 left-0 w-full rounded-full transition-all duration-300 ease-out"
-            style={{
-              height: `${scrollProgress * 100}%`,
-              background: `linear-gradient(to bottom, 
-                #ef4444 0%, 
-                #f97316 25%, 
-                #eab308 50%, 
-                #22c55e 75%, 
-                #3b82f6 100%)`,
-            }}
-          ></div>
-
-          {/* Progress dots */}
-          {currentProjects.map((_, index) => (
+            {/* Animated progress line */}
             <div
-              key={index}
-              className="absolute w-4 h-4 rounded-full border-2 border-white bg-red-600 scale-110 shadow-lg -translate-x-1/2 transition-all duration-500"
+              className="absolute top-0 left-0 w-full rounded-full transition-all duration-300 ease-out"
               style={{
-                top: `${
-                  (index / Math.max(currentProjects.length - 1, 1)) * 100
-                }%`,
-                left: "50%",
+                height: `${scrollProgress * 100}%`,
+                background: `linear-gradient(to bottom, 
+                  #ef4444 0%, 
+                  #f97316 25%, 
+                  #eab308 50%, 
+                  #22c55e 75%, 
+                  #3b82f6 100%)`,
               }}
             ></div>
-          ))}
-        </div>
 
-        <div className="space-y-16">
-          {currentProjects.map((project, index) => {
-            // Determine if this row should have image on right (even index) or left (odd index)
-            const isEvenIndex = index % 2 === 0;
-
-            return (
+            {/* Progress dots */}
+            {currentProjects.map((_, index) => (
               <div
-                key={project.id}
-                ref={(el) => (imageRefs.current[index] = el)}
-                data-image-index={index}
-                className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative"
-              >
-                {/* Description Section */}
+                key={index}
+                className="absolute w-4 h-4 rounded-full border-2 border-white bg-red-600 scale-110 shadow-lg -translate-x-1/2 transition-all duration-500"
+                style={{
+                  top: `${(index / (currentProjects.length - 1)) * 100}%`,
+                  left: "50%",
+                }}
+              ></div>
+            ))}
+          </div>
+
+          <div className="space-y-16">
+            {currentProjects.map((project, index) => {
+              // Determine if this row should have image on right (even index) or left (odd index)
+              const isEvenIndex = index % 2 === 0;
+
+              return (
                 <div
-                  className={`space-y-6 ${
-                    isEvenIndex ? "lg:order-1" : "lg:order-2"
-                  }`}
+                  key={project.id}
+                  ref={(el) => (imageRefs.current[index] = el)}
+                  data-image-index={index}
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center relative"
                 >
-                  <div className="inline-block bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                    {project.category}({index + 1})
-                  </div>
-
-                  <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
-                    {project.title}
-                  </h3>
-
-                  <div className="h-1 w-16 bg-red-600 rounded"></div>
-
-                  <p className="text-gray-600 text-lg leading-relaxed">
-                    {project.description}
-                  </p>
-
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium">Category:</span>{" "}
-                      {project.category}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium">Project ID:</span>{" "}
-                      {project.id}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium">Status:</span> Completed
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => openModal(project, index)}
-                    className="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-300"
-                  >
-                    View Details
-                    <svg
-                      className="w-4 h-4 ml-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </button>
-                </div>
-
-                {/* Image Section */}
-                <div
-                  className={`relative ${
-                    isEvenIndex ? "lg:order-2" : "lg:order-1"
-                  }`}
-                >
+                  {/* Description Section */}
                   <div
-                    className="relative h-96 w-full overflow-hidden rounded-lg shadow-lg group cursor-pointer"
-                    onClick={() => openModal(project, index)}
+                    className={`space-y-6 ${
+                      isEvenIndex ? "lg:order-1" : "lg:order-2"
+                    }`}
                   >
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      onError={(e) => {
-                        e.target.src = "/images/DmOffice.jpg"; // Fallback
-                      }}
-                    />
+                    <div className="inline-block bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                      home({index + 1})
+                    </div>
 
-                    {/* Image overlay on hover */}
-                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <div className="bg-white/90 backdrop-blur-sm rounded-full p-4 transform scale-90 group-hover:scale-100 transition-transform">
-                        <svg
-                          className="w-8 h-8 text-red-600"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"
-                          />
-                        </svg>
+                    <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+                      {project.title}
+                    </h3>
+
+                    <div className="h-1 w-16 bg-red-600 rounded"></div>
+
+                    <p className="text-gray-600 text-lg leading-relaxed">
+                      {project.description}
+                    </p>
+
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-500">
+                        <span className="font-medium">Category:</span>{" "}
+                        {project.category}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        <span className="font-medium">Project ID:</span>{" "}
+                        {project.id}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        <span className="font-medium">Status:</span> Completed
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => openModal(project, index)}
+                      className="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-all duration-300"
+                    >
+                      View Details
+                      <svg
+                        className="w-4 h-4 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Image Section */}
+                  <div
+                    className={`relative ${
+                      isEvenIndex ? "lg:order-2" : "lg:order-1"
+                    }`}
+                  >
+                    <div
+                      className="relative h-96 w-full overflow-hidden rounded-lg shadow-lg group cursor-pointer"
+                      onClick={() => openModal(project, index)}
+                    >
+                      <img
+                        src={project.image}
+                        alt={project.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        onError={(e) => {
+                          e.target.src = "/images/DmOffice.jpg"; // Fallback
+                        }}
+                      />
+
+                      {/* Image overlay on hover */}
+                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <div className="bg-white/90 backdrop-blur-sm rounded-full p-4 transform scale-90 group-hover:scale-100 transition-transform">
+                          <svg
+                            className="w-8 h-8 text-red-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"
+                            />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
+
+      {/* Other Categories - Simple Grid */}
+      {activeCategory !== "House" && (
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <h2 className="text-xl font-light text-gray-900 mb-6">
+            {activeCategory} projects
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {currentProjects.map((project, index) => (
+              <div
+                key={project.id}
+                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => openModal(project, index)}
+              >
+                <div className="h-48 bg-gray-100 relative group">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => {
+                      e.target.src = "/images/DmOffice.jpg"; // Fallback
+                    }}
+                  />
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 transform scale-90 group-hover:scale-100 transition-transform">
+                      <svg
+                        className="w-6 h-6 text-red-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    {project.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {project.category}
+                  </p>
+                  <p className="text-gray-700 text-sm">{project.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Image Modal with 3D Animations */}
       <ImageModal
