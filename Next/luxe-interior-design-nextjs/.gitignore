@@ -1,8 +1,0 @@
-/node_modules
-.next/
-original.mp4
-.env.local
-.DS_Store
-*.log
-3d.mp4
-compressed-540p.mp4
