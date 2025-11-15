@@ -255,7 +255,7 @@ const ImageModal = ({
                         transition={{ delay: 0.4 }}
                         className="inline-block bg-red-600 text-white px-3 py-1 rounded-full text-xs font-medium mb-2"
                       >
-                        home({currentIndex + 1})
+                        {project.category.toLowerCase()}({currentIndex + 1})
                       </motion.div>
                       <motion.h3
                         initial={{ x: -20, opacity: 0 }}
@@ -365,7 +365,28 @@ const ProductPage = () => {
         title: "Luxury Residential Complex",
         category: "Residentials",
         image: "/images/Viana.jpg",
-        description: "Premium residential development with modern amenities.",
+        description: "Premium residential development with modern amenities and spacious living areas.",
+      },
+      {
+        id: 2,
+        title: "Modern Apartment Building",
+        category: "Residentials",
+        image: "/images/home (1).jpeg",
+        description: "Contemporary apartment complex with state-of-the-art facilities.",
+      },
+      {
+        id: 3,
+        title: "Executive Residences",
+        category: "Residentials",
+        image: "/images/home (2).jpeg",
+        description: "High-end residential units designed for comfort and luxury.",
+      },
+      {
+        id: 4,
+        title: "Urban Living Spaces",
+        category: "Residentials",
+        image: "/images/home (3).jpeg",
+        description: "Modern urban residences with contemporary architecture.",
       },
     ],
     "Corporate offices": [
@@ -374,7 +395,28 @@ const ProductPage = () => {
         title: "Modern Corporate Office",
         category: "Corporate offices",
         image: "/images/CLB1.jpg",
-        description: "Contemporary office space designed for productivity.",
+        description: "Contemporary office space designed for productivity and collaboration.",
+      },
+      {
+        id: 2,
+        title: "Executive Office Suite",
+        category: "Corporate offices",
+        image: "/images/DmOffice.jpg",
+        description: "Premium office environment with cutting-edge design.",
+      },
+      {
+        id: 3,
+        title: "Corporate Headquarters",
+        category: "Corporate offices",
+        image: "/images/home (4).jpeg",
+        description: "Flagship office building with innovative workspace solutions.",
+      },
+      {
+        id: 4,
+        title: "Business Center",
+        category: "Corporate offices",
+        image: "/images/home (5).jpeg",
+        description: "Modern business hub designed for efficiency and style.",
       },
     ],
     "Retail Showrooms": [
@@ -383,7 +425,28 @@ const ProductPage = () => {
         title: "Premium Retail Space",
         category: "Retail Showrooms",
         image: "/images/NS1.jpg",
-        description: "Elegant retail showroom with modern design elements.",
+        description: "Elegant retail showroom with modern design elements and customer-focused layout.",
+      },
+      {
+        id: 2,
+        title: "Luxury Brand Showroom",
+        category: "Retail Showrooms",
+        image: "/images/Viana.jpg",
+        description: "High-end retail space designed to showcase premium products.",
+      },
+      {
+        id: 3,
+        title: "Contemporary Retail Gallery",
+        category: "Retail Showrooms",
+        image: "/images/home (6).jpeg",
+        description: "Modern showroom with innovative display solutions.",
+      },
+      {
+        id: 4,
+        title: "Flagship Store Design",
+        category: "Retail Showrooms",
+        image: "/images/CLB1.jpg",
+        description: "Iconic retail space with unique architectural features.",
       },
     ],
     "DM Factory Complex": [
@@ -392,7 +455,28 @@ const ProductPage = () => {
         title: "Industrial Complex Design",
         category: "DM Factory Complex",
         image: "/images/SEBSA1.jpg",
-        description: "Modern industrial facility with functional design.",
+        description: "Modern industrial facility with functional design and efficiency.",
+      },
+      {
+        id: 2,
+        title: "Manufacturing Hub",
+        category: "DM Factory Complex",
+        image: "/images/home (1).jpeg",
+        description: "State-of-the-art manufacturing facility with advanced infrastructure.",
+      },
+      {
+        id: 3,
+        title: "Production Center",
+        category: "DM Factory Complex",
+        image: "/images/home (2).jpeg",
+        description: "Contemporary production facility with optimized workflow design.",
+      },
+      {
+        id: 4,
+        title: "Industrial Park",
+        category: "DM Factory Complex",
+        image: "/images/home (3).jpeg",
+        description: "Comprehensive industrial complex with modern amenities.",
       },
     ],
     "Restaurants and Coffee bars": [
@@ -401,7 +485,28 @@ const ProductPage = () => {
         title: "Modern Restaurant Interior",
         category: "Restaurants and Coffee bars",
         image: "/images/DmOffice.jpg",
-        description: "Contemporary dining space with welcoming atmosphere.",
+        description: "Contemporary dining space with welcoming atmosphere and elegant design.",
+      },
+      {
+        id: 2,
+        title: "Artisan Coffee Bar",
+        category: "Restaurants and Coffee bars",
+        image: "/images/about.jpg",
+        description: "Stylish coffee bar with cozy ambiance and modern aesthetics.",
+      },
+      {
+        id: 3,
+        title: "Fine Dining Restaurant",
+        category: "Restaurants and Coffee bars",
+        image: "/images/Viana.jpg",
+        description: "Upscale restaurant interior with sophisticated design elements.",
+      },
+      {
+        id: 4,
+        title: "Casual Dining Space",
+        category: "Restaurants and Coffee bars",
+        image: "/images/NS1.jpg",
+        description: "Relaxed dining environment with contemporary comfort.",
       },
     ],
     Hotels: [
@@ -410,7 +515,28 @@ const ProductPage = () => {
         title: "Luxury Hotel Design",
         category: "Hotels",
         image: "/images/about.jpg",
-        description: "Elegant hotel interior with premium finishes.",
+        description: "Elegant hotel interior with premium finishes and world-class amenities.",
+      },
+      {
+        id: 2,
+        title: "Boutique Hotel Suite",
+        category: "Hotels",
+        image: "/images/Viana.jpg",
+        description: "Exclusive hotel rooms designed for ultimate comfort and luxury.",
+      },
+      {
+        id: 3,
+        title: "Resort Hotel Complex",
+        category: "Hotels",
+        image: "/images/home (4).jpeg",
+        description: "Comprehensive hotel resort with stunning architecture and design.",
+      },
+      {
+        id: 4,
+        title: "Urban Hotel Lobby",
+        category: "Hotels",
+        image: "/images/CLB1.jpg",
+        description: "Modern hotel entrance with impressive architectural features.",
       },
     ],
   };
@@ -517,6 +643,12 @@ const ProductPage = () => {
     setVisibleImages(new Set([0, 1, 2, 3, 4, 5])); // Show ALL images immediately
     setScrollProgress(0);
     imageRefs.current = [];
+    
+    // Scroll to top of page when category changes
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   }, [activeCategory]);
 
   // Auto-scroll to header when coming from "View More" button
@@ -579,14 +711,15 @@ const ProductPage = () => {
         </div>
       </div>
 
-      {/* Vertical Image Slider - House Category */}
-      {activeCategory === "House" && (
+      {/* Content Section */}
+      <>
+        {/* Vertical Image Slider - All Categories */}
         <div
           ref={containerRef}
           className="max-w-7xl mx-auto px-4 py-8 relative"
         >
           <h2 className="text-2xl font-light text-gray-900 mb-8 text-center">
-            House Projects
+            {activeCategory} Projects
           </h2>
 
           {/* Animated Progress Line */}
@@ -640,7 +773,7 @@ const ProductPage = () => {
                     }`}
                   >
                     <div className="inline-block bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                      home({index + 1})
+                      {activeCategory.toLowerCase()}({index + 1})
                     </div>
 
                     <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
@@ -732,64 +865,7 @@ const ProductPage = () => {
             })}
           </div>
         </div>
-      </div>
-
-      {/* Other Categories - Simple Grid */}
-      {activeCategory !== "House" && (
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <h2 className="text-xl font-light text-gray-900 mb-6">
-            {activeCategory} projects
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentProjects.map((project, index) => (
-              <div
-                key={project.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => openModal(project, index)}
-              >
-                <div className="h-48 bg-gray-100 relative group">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    onError={(e) => {
-                      e.target.src = "/images/DmOffice.jpg"; // Fallback
-                    }}
-                  />
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 transform scale-90 group-hover:scale-100 transition-transform">
-                      <svg
-                        className="w-6 h-6 text-red-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    {project.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {project.category}
-                  </p>
-                  <p className="text-gray-700 text-sm">{project.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      </>
 
       {/* Image Modal with 3D Animations */}
       <ImageModal
